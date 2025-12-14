@@ -1,6 +1,14 @@
-import React from 'react';
 import { DATA } from '../data/portfolio';
 import './Skills.css';
+
+// Helper to render icon (supports Font Awesome or custom images)
+function SkillIcon({ icon, name }: { icon: string; name: string }) {
+    if (icon.startsWith('img:')) {
+        const src = icon.replace('img:', '');
+        return <img src={src} alt={name} className="skill-icon-img" />;
+    }
+    return <i className={icon}></i>;
+}
 
 export default function Skills() {
     const categories = [
@@ -28,7 +36,7 @@ export default function Skills() {
                                 <div className="skill-list">
                                     {skills.map(skill => (
                                         <div key={skill.name} className="skill-item glass-card">
-                                            <i className={skill.icon}></i>
+                                            <SkillIcon icon={skill.icon} name={skill.name} />
                                             <span>{skill.name}</span>
                                         </div>
                                     ))}
@@ -43,7 +51,7 @@ export default function Skills() {
                     <div className="marquee-track">
                         {[...DATA.skills, ...DATA.skills].map((skill, index) => (
                             <span key={`${skill.name}-${index}`} className="marquee-item">
-                                <i className={skill.icon}></i>
+                                <SkillIcon icon={skill.icon} name={skill.name} />
                                 {skill.name}
                             </span>
                         ))}

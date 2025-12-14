@@ -302,6 +302,46 @@ export default function Hero() {
         return () => ctx.revert();
     }, []);
 
+    // Typing effect for tagline
+    useEffect(() => {
+        const phrases = ['code.', 'teach.', 'build the future.'];
+        let phraseIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        let typingSpeed = 100;
+
+        const typedElement = document.querySelector('.tagline-typed');
+        if (!typedElement) return;
+
+        const type = () => {
+            const currentPhrase = phrases[phraseIndex];
+
+            if (isDeleting) {
+                typedElement.textContent = currentPhrase.substring(0, charIndex - 1);
+                charIndex--;
+                typingSpeed = 50;
+            } else {
+                typedElement.textContent = currentPhrase.substring(0, charIndex + 1);
+                charIndex++;
+                typingSpeed = 100;
+            }
+
+            if (!isDeleting && charIndex === currentPhrase.length) {
+                typingSpeed = 2000; // Pause at end
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                phraseIndex = (phraseIndex + 1) % phrases.length;
+                typingSpeed = 500; // Pause before next phrase
+            }
+
+            setTimeout(type, typingSpeed);
+        };
+
+        const timeout = setTimeout(type, 1000);
+        return () => clearTimeout(timeout);
+    }, []);
+
     return (
         <section className="hero" id="hero" ref={containerRef}>
             {/* Animated Canvas Background */}
@@ -319,12 +359,14 @@ export default function Hero() {
                         {DATA.profile.name}
                     </h1>
 
-                    {/* Title */}
+                    {/* Title with Typing Effect */}
                     <div className="hero-title">
                         <span className="hero-title-line">{DATA.profile.title}</span>
-                        <span className="hero-title-line hero-title-accent">
-                            crafting digital experiences that matter.
-                        </span>
+                        <div className="hero-tagline-typing">
+                            <span className="tagline-static">I </span>&nbsp;
+                            <span className="tagline-typed"></span>
+                            <span className="tagline-cursor">|</span>
+                        </div>
                     </div>
 
                     {/* Description */}

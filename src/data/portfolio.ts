@@ -49,22 +49,22 @@ export const DATA = {
     },
 
     skills: [
-        { name: 'React', icon: 'fab fa-react', category: 'frontend' },
-        { name: 'Angular', icon: 'fab fa-angular', category: 'frontend' },
-        { name: 'TypeScript', icon: 'fas fa-code', category: 'languages' },
-        { name: 'JavaScript', icon: 'fab fa-js-square', category: 'languages' },
-        { name: 'HTML5', icon: 'fab fa-html5', category: 'frontend' },
-        { name: 'CSS3', icon: 'fab fa-css3-alt', category: 'frontend' },
-        { name: 'Node.js', icon: 'fab fa-node-js', category: 'backend' },
-        { name: 'Express.js', icon: 'fas fa-server', category: 'backend' },
-        { name: 'Spring Boot', icon: 'fas fa-leaf', category: 'backend' },
-        { name: 'Laravel', icon: 'fab fa-laravel', category: 'backend' },
-        { name: 'Python', icon: 'fab fa-python', category: 'languages' },
-        { name: 'Java', icon: 'fab fa-java', category: 'languages' },
-        { name: 'MySQL', icon: 'fas fa-database', category: 'backend' },
-        { name: 'MongoDB', icon: 'fas fa-database', category: 'backend' },
-        { name: 'Git', icon: 'fab fa-git-alt', category: 'tools' },
-        { name: 'Figma', icon: 'fab fa-figma', category: 'tools' }
+        { name: 'React', icon: 'img:/icons/react.svg', category: 'frontend' },
+        { name: 'Angular', icon: 'img:/icons/angular.svg', category: 'frontend' },
+        { name: 'TypeScript', icon: 'img:/icons/typescript.svg', category: 'languages' },
+        { name: 'JavaScript', icon: 'img:/icons/javascript.svg', category: 'languages' },
+        { name: 'HTML5', icon: 'img:/icons/html5.svg', category: 'frontend' },
+        { name: 'CSS3', icon: 'img:/icons/css3.svg', category: 'frontend' },
+        { name: 'Node.js', icon: 'img:/icons/nodejs.svg', category: 'backend' },
+        { name: 'Express.js', icon: 'img:/icons/express.svg', category: 'backend' },
+        { name: 'Spring Boot', icon: 'img:/icons/spring.svg', category: 'backend' },
+        { name: 'Laravel', icon: 'img:/icons/laravel.svg', category: 'backend' },
+        { name: 'Python', icon: 'img:/icons/python.svg', category: 'languages' },
+        { name: 'Java', icon: 'img:/icons/java.svg', category: 'languages' },
+        { name: 'MySQL', icon: 'img:/icons/mysql.svg', category: 'backend' },
+        { name: 'MongoDB', icon: 'img:/icons/mongodb.svg', category: 'backend' },
+        { name: 'Git', icon: 'img:/icons/git.svg', category: 'tools' },
+        { name: 'Figma', icon: 'img:/icons/figma.svg', category: 'tools' }
     ] as Skill[],
 
     projects: [
@@ -74,7 +74,7 @@ export const DATA = {
             description: 'AI-powered SMS assistant providing real-time, context-aware responses without internet.',
             longDescription: 'Co-developed an SMS-based conversational AI system providing real-time, context-aware responses without internet access. Integrated Google Gemini AI for natural language processing and PyAutoGUI for automated SMS handling.',
             tech: ['Python', 'Google Gemini AI', 'PyAutoGUI', 'NLP'],
-            image: 'https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=1200',
+            image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80',
             link: 'https://github.com/Ajayduddi',
             color: '#10b981'
         },
@@ -84,7 +84,7 @@ export const DATA = {
             description: 'Enterprise ticketing system with real-time monitoring and role-based access control.',
             longDescription: 'Developed a comprehensive system to streamline ticket handling and improve internal support workflows. Features centralized dashboard, real-time monitoring, role-based access control, and secure authentication using Passport.js.',
             tech: ['Node.js', 'MongoDB', 'JavaScript', 'Passport.js'],
-            image: 'https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=1200',
+            image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80',
             link: 'https://ajayduddi.github.io/Ticketing-Tool/',
             color: '#3b82f6'
         },
@@ -94,7 +94,7 @@ export const DATA = {
             description: 'Laboratory management system with appointment scheduling and report generation.',
             longDescription: 'Developed a responsive lab management system to streamline operations and enhance patient management. Built with React and Material UI, featuring appointment scheduling, patient data management, and report generation.',
             tech: ['React', 'Material UI', 'JavaScript'],
-            image: 'https://images.pexels.com/photos/1181263/pexels-photo-1181263.jpeg?auto=compress&cs=tinysrgb&w=1200',
+            image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80',
             link: 'https://github.com/Ajayduddi/Medilab',
             github: 'https://github.com/Ajayduddi/Medilab',
             color: '#ef4444'
@@ -126,10 +126,11 @@ export const DATA = {
         },
         {
             id: 'wisetech',
-            role: 'Full Stack Developer',
+            role: 'Full Stack Developer (Part-time)',
             company: 'Wise Tech Board (Remote)',
             duration: 'Mar 2024 - Aug 2024',
             description: [
+                'Part-time role during college studies',
                 'Contributed to client-based web applications - Aadhya Tax Solution and Finapp',
                 'Developed third-party authentication and dynamic data validation',
                 'Implemented performance-optimized admin dashboard'
@@ -142,6 +143,7 @@ export const DATA = {
             company: 'PrahanSoft, Narasaraopet',
             duration: 'May 2023 - Jul 2023',
             description: [
+                'Internship - Summer 2023',
                 'Developed intuitive interface for laboratory management system using React',
                 'Built appointment scheduling and patient data management features',
                 'Used Material UI and React Shades for enhanced UX'

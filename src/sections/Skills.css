@@ -62,6 +62,12 @@
     transition: transform var(--transition-normal);
 }
 
+.skill-icon-img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
 .skill-item:hover i {
     transform: scale(1.2);
 }

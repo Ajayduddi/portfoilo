@@ -1,43 +1,35 @@
-import React, { useState, useRef } from 'react';
-import emailjs from '@emailjs/browser';
+import { useRef } from 'react';
 import { DATA } from '../data/portfolio';
 import './Contact.css';
 
 export default function Contact() {
     const formRef = useRef<HTMLFormElement>(null);
-    const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!formRef.current) return;
 
-        setStatus('sending');
+        // Get form data
+        const formData = new FormData(formRef.current);
+        const name = formData.get('user_name') as string;
+        const email = formData.get('user_email') as string;
+        const subject = formData.get('subject') as string;
+        const message = formData.get('message') as string;
 
-        try {
-            // EmailJS credentials - User needs to set these in their .env file
-            const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-            const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-            const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+        // Create mailto link
+        const mailtoBody = `Hi Ajay,
 
-            if (!serviceId || !templateId || !publicKey) {
-                console.error('EmailJS credentials not configured. Please set VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_TEMPLATE_ID, and VITE_EMAILJS_PUBLIC_KEY in your .env file.');
-                setStatus('error');
-                return;
-            }
+${message}
 
-            await emailjs.sendForm(serviceId, templateId, formRef.current, publicKey);
+---
+From: ${name}
+Email: ${email}`;
 
-            setStatus('success');
-            formRef.current.reset();
+        const mailtoLink = `mailto:${DATA.profile.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(mailtoBody)}`;
 
-            // Reset status after 5 seconds
-            setTimeout(() => setStatus('idle'), 5000);
-        } catch (error) {
-            console.error('EmailJS error:', error);
-            setStatus('error');
-            setTimeout(() => setStatus('idle'), 5000);
-        }
+        // Open user's email client
+        window.location.href = mailtoLink;
     };
 
     return (
@@ -137,44 +129,14 @@ export default function Contact() {
                             <button
                                 type="submit"
                                 className="contact-submit-btn"
-                                disabled={status === 'sending'}
                             >
-                                {status === 'idle' && (
-                                    <>
-                                        Send Message
-                                        <i className="fas fa-paper-plane"></i>
-                                    </>
-                                )}
-                                {status === 'sending' && (
-                                    <>
-                                        Sending...
-                                        <i className="fas fa-spinner fa-spin"></i>
-                                    </>
-                                )}
-                                {status === 'success' && (
-                                    <>
-                                        Message Sent!
-                                        <i className="fas fa-check"></i>
-                                    </>
-                                )}
-                                {status === 'error' && (
-                                    <>
-                                        Failed to Send
-                                        <i className="fas fa-exclamation-triangle"></i>
-                                    </>
-                                )}
+                                Send Message
+                                <i className="fas fa-envelope-open"></i>
                             </button>
 
-                            {status === 'success' && (
-                                <p className="form-message success">
-                                    Thanks for reaching out! I'll get back to you soon.
-                                </p>
-                            )}
-                            {status === 'error' && (
-                                <p className="form-message error">
-                                    Something went wrong. Please try again or email me directly.
-                                </p>
-                            )}
+                            {/* <p className="form-message info">
+                                This will open your email client to send the message.
+                            </p> */}
                         </form>
                     </div>
                 </div>

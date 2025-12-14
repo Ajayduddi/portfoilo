@@ -10,7 +10,7 @@ export default function About() {
                     {/* Left: Image */}
                     <div className="about-image fade-in">
                         <div className="about-image-wrapper">
-                            <img src="./assets/photo.jpg" alt={DATA.profile.name} />
+                            <img src="/photo.jpg" alt={DATA.profile.name} />
                             <div className="about-image-overlay"></div>
                         </div>
                         <div className="about-image-badge glass-card">

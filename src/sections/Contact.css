@@ -191,6 +191,13 @@
     border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
+.form-message.info {
+    background: rgba(100, 108, 255, 0.1);
+    color: var(--text-muted);
+    border: 1px solid var(--glass-border);
+    font-size: 0.85rem;
+}
+
 /* Responsive */
 @media (max-width: 900px) {
     .contact-wrapper {
