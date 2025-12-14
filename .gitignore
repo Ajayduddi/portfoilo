@@ -1,0 +1,10 @@
+node_modules
+.zencoder
+.DS_Store
+.env
+.idea
+.vscode
+*.log
+*.tmp
+*.bak
+*.swp

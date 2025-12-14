@@ -1,0 +1,179 @@
+.projects {
+    background: var(--bg-primary);
+}
+
+.projects-list {
+    display: flex;
+    flex-direction: column;
+    gap: 120px;
+}
+
+/* Project Spotlight */
+.project-spotlight {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 60px;
+    align-items: center;
+    cursor: pointer;
+}
+
+.project-spotlight.reverse {
+    grid-template-columns: 1fr 1.2fr;
+}
+
+.project-spotlight.reverse .project-image {
+    order: 2;
+}
+
+.project-spotlight.reverse .project-content {
+    order: 1;
+    text-align: right;
+}
+
+.project-spotlight.reverse .project-tech,
+.project-spotlight.reverse .project-actions {
+    justify-content: flex-end;
+}
+
+/* Image */
+.project-image {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    aspect-ratio: 16/10;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.project-spotlight:hover .project-image {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+}
+
+.project-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s ease;
+}
+
+.project-spotlight:hover .project-image img {
+    transform: scale(1.1);
+}
+
+.project-image-overlay {
+    position: absolute;
+    inset: 0;
+    opacity: 0.5;
+    mix-blend-mode: overlay;
+    transition: opacity 0.5s ease;
+}
+
+.project-spotlight:hover .project-image-overlay {
+    opacity: 0.3;
+}
+
+/* Content */
+.project-content {
+    padding: 20px 0;
+}
+
+.project-number {
+    font-family: var(--font-display);
+    font-size: 5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--bg-tertiary), transparent);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 10px;
+    display: block;
+    transition: all 0.5s ease;
+}
+
+.project-spotlight:hover .project-number {
+    background: linear-gradient(135deg, var(--accent), #8b5cf6);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.project-title {
+    font-size: clamp(1.8rem, 3vw, 2.5rem);
+    margin-bottom: 16px;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
+}
+
+.project-spotlight:hover .project-title {
+    color: var(--accent);
+}
+
+.project-description {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    line-height: 1.8;
+    margin-bottom: 24px;
+}
+
+.project-tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 28px;
+}
+
+.tech-tag {
+    padding: 8px 16px;
+    font-size: 0.8rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    color: var(--text-secondary);
+    transition: all var(--transition-normal);
+}
+
+.tech-tag:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.project-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.project-actions .btn {
+    padding: 12px 24px;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 900px) {
+    .projects-list {
+        gap: 80px;
+    }
+
+    .project-spotlight,
+    .project-spotlight.reverse {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .project-spotlight.reverse .project-image,
+    .project-spotlight.reverse .project-content {
+        order: unset;
+    }
+
+    .project-spotlight.reverse .project-content {
+        text-align: left;
+    }
+
+    .project-spotlight.reverse .project-tech,
+    .project-spotlight.reverse .project-actions {
+        justify-content: flex-start;
+    }
+
+    .project-number {
+        font-size: 3.5rem;
+    }
+}
