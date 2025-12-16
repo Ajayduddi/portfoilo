@@ -25,6 +25,16 @@ export interface Skill {
     category: 'frontend' | 'backend' | 'tools' | 'languages';
 }
 
+export interface Service {
+    id: string;
+    icon: string;
+    title: string;
+    description: string;
+    features: string[];
+    color: string;
+}
+
+
 export const DATA = {
     profile: {
         name: 'Ajay Duddi',
@@ -32,7 +42,6 @@ export const DATA = {
         subtitle: 'Building Digital Experiences That Matter',
         bio: 'Computer Science graduate with hands-on experience in full-stack development using React, Laravel, Angular and MySQL. Passionate about building scalable applications and solving complex problems. Currently working as a Technical Trainer while seeking opportunities to grow as a Software Developer.',
         email: 'ajayduddi.work@gmail.com',
-        phone: '+91 9014404336',
         location: 'Hyderabad, India',
         available: true,
         socials: {
@@ -47,6 +56,33 @@ export const DATA = {
             technologies: '15+'
         }
     },
+
+    services: [
+        {
+            id: 'websites',
+            icon: 'img:/icons/html5.svg',
+            title: 'Website Development',
+            description: 'Custom, responsive websites built with modern technologies. From landing pages to complex multi-page sites, designed for performance and user experience.',
+            features: ['Responsive Design', 'SEO Optimized', 'Fast Loading', 'Modern UI/UX'],
+            color: '#e34f26'
+        },
+        {
+            id: 'webapps',
+            icon: 'img:/icons/react.svg',
+            title: 'Web Applications',
+            description: 'Full-stack web applications tailored to your business needs. Scalable, secure, and built with the latest frameworks and best practices.',
+            features: ['React / Angular', 'Node.js / Laravel', 'Database Design', 'Authentication'],
+            color: '#61dafb'
+        },
+        {
+            id: 'api',
+            icon: 'img:/icons/nodejs.svg',
+            title: 'API Development',
+            description: 'RESTful APIs and backend services that power your applications. Clean, documented, and built for reliability and scalability.',
+            features: ['RESTful Design', 'Documentation', 'Security', 'Performance'],
+            color: '#339933'
+        }
+    ] as Service[],
 
     skills: [
         { name: 'React', icon: 'img:/icons/react.svg', category: 'frontend' },
@@ -74,8 +110,8 @@ export const DATA = {
             description: 'AI-powered SMS assistant providing real-time, context-aware responses without internet.',
             longDescription: 'Co-developed an SMS-based conversational AI system providing real-time, context-aware responses without internet access. Integrated Google Gemini AI for natural language processing and PyAutoGUI for automated SMS handling.',
             tech: ['Python', 'Google Gemini AI', 'PyAutoGUI', 'NLP'],
-            image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80',
-            link: 'https://github.com/Ajayduddi',
+            image: '/smsgpt.jpg',
+            link: 'https://smsgpt.ajayduddi.site/',
             color: '#10b981'
         },
         {

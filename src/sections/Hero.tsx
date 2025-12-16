@@ -295,51 +295,12 @@ export default function Hero() {
                 .fromTo('.hero-name', { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.8 }, '-=0.3')
                 .fromTo('.hero-title-line', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.6, stagger: 0.1 }, '-=0.4')
                 .fromTo('.hero-description', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, '-=0.2')
+                .fromTo('.hero-badge', { opacity: 0, y: 20, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.15 }, '-=0.4')
                 .fromTo('.hero-cta', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, '-=0.2')
                 .fromTo('.hero-scroll-hint', { opacity: 0 }, { opacity: 1, duration: 0.8 }, '-=0.2');
         }, containerRef);
 
         return () => ctx.revert();
-    }, []);
-
-    // Typing effect for tagline
-    useEffect(() => {
-        const phrases = ['code.', 'teach.', 'build the future.'];
-        let phraseIndex = 0;
-        let charIndex = 0;
-        let isDeleting = false;
-        let typingSpeed = 100;
-
-        const typedElement = document.querySelector('.tagline-typed');
-        if (!typedElement) return;
-
-        const type = () => {
-            const currentPhrase = phrases[phraseIndex];
-
-            if (isDeleting) {
-                typedElement.textContent = currentPhrase.substring(0, charIndex - 1);
-                charIndex--;
-                typingSpeed = 50;
-            } else {
-                typedElement.textContent = currentPhrase.substring(0, charIndex + 1);
-                charIndex++;
-                typingSpeed = 100;
-            }
-
-            if (!isDeleting && charIndex === currentPhrase.length) {
-                typingSpeed = 2000; // Pause at end
-                isDeleting = true;
-            } else if (isDeleting && charIndex === 0) {
-                isDeleting = false;
-                phraseIndex = (phraseIndex + 1) % phrases.length;
-                typingSpeed = 500; // Pause before next phrase
-            }
-
-            setTimeout(type, typingSpeed);
-        };
-
-        const timeout = setTimeout(type, 1000);
-        return () => clearTimeout(timeout);
     }, []);
 
     return (
@@ -359,13 +320,19 @@ export default function Hero() {
                         {DATA.profile.name}
                     </h1>
 
-                    {/* Title with Typing Effect */}
-                    <div className="hero-title">
-                        <span className="hero-title-line">{DATA.profile.title}</span>
-                        <div className="hero-tagline-typing">
-                            <span className="tagline-static">I </span>&nbsp;
-                            <span className="tagline-typed"></span>
-                            <span className="tagline-cursor">|</span>
+                    {/* Redesigned Glass Chips Tagline */}
+                    <div className="hero-badges">
+                        <div className="hero-badge glass-card">
+                            <span>I </span>
+                            <span className="gradient-text">Code</span>
+                        </div>
+                        <div className="hero-badge glass-card">
+                            <span>I </span>
+                            <span className="gradient-text">Teach</span>
+                        </div>
+                        <div className="hero-badge glass-card">
+                            <span>I </span>
+                            <span className="gradient-text">Build The Future</span>
                         </div>
                     </div>
 

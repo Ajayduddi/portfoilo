@@ -1,29 +1,22 @@
 import React from 'react';
+import { DATA } from '../data/portfolio';
 import './Services.css';
 
-const services = [
-    {
-        id: 'websites',
-        icon: 'fas fa-globe',
-        title: 'Website Development',
-        description: 'Custom, responsive websites built with modern technologies. From landing pages to complex multi-page sites, designed for performance and user experience.',
-        features: ['Responsive Design', 'SEO Optimized', 'Fast Loading', 'Modern UI/UX']
-    },
-    {
-        id: 'webapps',
-        icon: 'fas fa-laptop-code',
-        title: 'Web Applications',
-        description: 'Full-stack web applications tailored to your business needs. Scalable, secure, and built with the latest frameworks and best practices.',
-        features: ['React / Angular', 'Node.js / Laravel', 'Database Design', 'Authentication']
-    },
-    {
-        id: 'api',
-        icon: 'fas fa-server',
-        title: 'API Development',
-        description: 'RESTful APIs and backend services that power your applications. Clean, documented, and built for reliability and scalability.',
-        features: ['RESTful Design', 'Documentation', 'Security', 'Performance']
+// Helper to render icon (supports Font Awesome or custom images)
+function ServiceIcon({ icon, title, color }: { icon: string; title: string; color: string }) {
+    if (icon.startsWith('img:')) {
+        const src = icon.replace('img:', '');
+        return (
+            <img
+                src={src}
+                alt={title}
+                className="service-icon-img"
+                style={{ filter: `drop-shadow(0 0 8px ${color}40)` }}
+            />
+        );
     }
-];
+    return <i className={icon} style={{ color }}></i>;
+}
 
 export default function Services() {
     return (
@@ -38,10 +31,10 @@ export default function Services() {
                 </div>
 
                 <div className="services-grid">
-                    {services.map((service, index) => (
+                    {DATA.services.map((service, index) => (
                         <div key={service.id} className="service-card glass-card fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
                             <div className="service-icon">
-                                <i className={service.icon}></i>
+                                <ServiceIcon icon={service.icon} title={service.title} color={service.color} />
                             </div>
                             <h3 className="service-title">{service.title}</h3>
                             <p className="service-description">{service.description}</p>

@@ -56,10 +56,6 @@ Email: ${email}`;
                                 <i className="fas fa-envelope"></i>
                                 <span>{DATA.profile.email}</span>
                             </a>
-                            <a href={`tel:${DATA.profile.phone}`} className="contact-detail-item">
-                                <i className="fas fa-phone"></i>
-                                <span>{DATA.profile.phone}</span>
-                            </a>
                             <div className="contact-detail-item">
                                 <i className="fas fa-map-marker-alt"></i>
                                 <span>{DATA.profile.location}</span>
@@ -134,9 +130,6 @@ Email: ${email}`;
                                 <i className="fas fa-envelope-open"></i>
                             </button>
 
-                            {/* <p className="form-message info">
-                                This will open your email client to send the message.
-                            </p> */}
                         </form>
                     </div>
                 </div>

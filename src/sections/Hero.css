@@ -91,81 +91,40 @@
     color: var(--accent);
 }
 
-/* Typing Effect */
-.hero-roles {
+/* Glass Chips Tagline */
+.hero-badges {
     display: flex;
-    align-items: center;
+    flex-wrap: wrap;
     justify-content: center;
-    gap: 4px;
+    gap: 16px;
+    margin-bottom: 32px;
 }
 
-.hero-role-text {
-    font-size: clamp(1.25rem, 3vw, 1.75rem);
-    color: var(--text-secondary);
-    font-weight: 500;
-}
-
-.hero-typing-cursor {
-    font-size: clamp(1.25rem, 3vw, 1.75rem);
-    color: var(--accent);
-    font-weight: 300;
-    animation: blink 1s step-end infinite;
-}
-
-@keyframes blink {
-
-    0%,
-    50% {
-        opacity: 1;
-    }
-
-    51%,
-    100% {
-        opacity: 0;
-    }
-}
-
-/* Typing Tagline */
-.hero-tagline-typing {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 16px;
-    font-size: clamp(1.3rem, 3vw, 1.8rem);
+.hero-badge {
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-size: clamp(1rem, 2.5vw, 1.25rem);
     font-weight: 600;
-}
-
-.tagline-static {
     color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(10, 10, 10, 0.8);
+    /* Darker background */
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.tagline-typed {
-    background: linear-gradient(90deg, #8b5cf6, #a78bfa);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    display: inline-block;
-    text-align: left;
+.hero-badge span:first-child {
+    font-weight: 400;
+    opacity: 0.8;
 }
 
-.tagline-cursor {
-    color: var(--accent);
-    font-weight: 300;
-    animation: blink 1s step-end infinite;
-    margin-left: 2px;
-}
-
-@keyframes blink {
-
-    0%,
-    50% {
-        opacity: 1;
-    }
-
-    51%,
-    100% {
-        opacity: 0;
-    }
+.hero-badge:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(100, 108, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 /* Description */

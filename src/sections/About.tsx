@@ -50,10 +50,6 @@ export default function About() {
                                 <i className="fas fa-envelope"></i>
                                 <span>{DATA.profile.email}</span>
                             </a>
-                            <a href={`tel:${DATA.profile.phone}`} className="contact-link">
-                                <i className="fas fa-phone"></i>
-                                <span>{DATA.profile.phone}</span>
-                            </a>
                             <div className="contact-link">
                                 <i className="fas fa-map-marker-alt"></i>
                                 <span>{DATA.profile.location}</span>
