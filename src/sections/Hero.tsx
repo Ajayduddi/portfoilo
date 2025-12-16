@@ -297,6 +297,7 @@ export default function Hero() {
                 .fromTo('.hero-description', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, '-=0.2')
                 .fromTo('.hero-badge', { opacity: 0, y: 20, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.15 }, '-=0.4')
                 .fromTo('.hero-cta', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, '-=0.2')
+                .fromTo('.hero-visual', { opacity: 0, x: 20, rotationY: -10 }, { opacity: 1, x: 0, rotationY: -10, duration: 0.8 }, '-=0.4')
                 .fromTo('.hero-scroll-hint', { opacity: 0 }, { opacity: 1, duration: 0.8 }, '-=0.2');
         }, containerRef);
 
@@ -356,7 +357,79 @@ export default function Hero() {
                     </div>
                 </div>
 
-                {/* Scroll Hint */}
+                {/* Right Side: Sci-Fi Holographic HUD */}
+                <div className="hero-visual">
+                    <div className="hud-container">
+                        {/* Scanline Overlay */}
+                        <div className="hud-scanlines"></div>
+
+                        {/* Profile Scan Ring */}
+                        <div className="hud-scan-ring">
+                            <div className="scan-ring-outer"></div>
+                            <div className="scan-ring-inner"></div>
+                            <div className="scan-line-sweep"></div>
+                            <div className="scan-center">
+                                <i className="fas fa-user-astronaut"></i>
+                            </div>
+                        </div>
+
+                        {/* Data Panels */}
+                        <div className="hud-panel panel-top-left">
+                            <div className="panel-header">
+                                <span className="blink-dot"></span>
+                                <span>SYS_STATUS</span>
+                            </div>
+                            <div className="panel-content">
+                                <span className="status-online">● ONLINE</span>
+                            </div>
+                        </div>
+
+                        <div className="hud-panel panel-top-right">
+                            <div className="panel-header">
+                                <span className="blink-dot"></span>
+                                <span>SKILLS_DB</span>
+                            </div>
+                            <div className="panel-content">
+                                <div className="progress-bar">
+                                    <div className="progress-fill" style={{ width: '100%' }}></div>
+                                </div>
+                                <span>LOADED: 100%</span>
+                            </div>
+                        </div>
+
+                        <div className="hud-panel panel-bottom-left">
+                            <div className="panel-header">
+                                <span className="blink-dot"></span>
+                                <span>METRICS</span>
+                            </div>
+                            <div className="panel-content metrics">
+                                <div><span className="metric-val">{DATA.profile.stats.studentsTrainted}</span> STUDENTS</div>
+                                <div><span className="metric-val">{DATA.profile.stats.projects}</span> PROJECTS</div>
+                                <div><span className="metric-val">{DATA.profile.stats.technologies}</span> SKILLS</div>
+                            </div>
+                        </div>
+
+                        <div className="hud-panel panel-bottom-right">
+                            <div className="panel-header">
+                                <span className="blink-dot"></span>
+                                <span>TERMINAL</span>
+                            </div>
+                            <div className="panel-content terminal">
+                                <span className="terminal-line">&gt; init developer.exe</span>
+                                <span className="terminal-line">&gt; loading skills...</span>
+                                <span className="terminal-line typing">&gt; READY_<span className="cursor">|</span></span>
+                            </div>
+                        </div>
+
+                        {/* Corner Brackets */}
+                        <div className="hud-corner corner-tl"></div>
+                        <div className="hud-corner corner-tr"></div>
+                        <div className="hud-corner corner-bl"></div>
+                        <div className="hud-corner corner-br"></div>
+                    </div>
+                </div>
+
+                {/* Scroll Hint (Positioned Absolutely at bottom now) */}
                 <div className="hero-scroll-hint">
                     <span>Scroll to explore</span>
                     <div className="hero-scroll-indicator">

@@ -1,4 +1,3 @@
-import React from 'react';
 import { DATA } from '../data/portfolio';
 import './About.css';
 
