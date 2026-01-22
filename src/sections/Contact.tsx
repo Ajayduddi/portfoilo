@@ -47,8 +47,8 @@ Email: ${email}`;
                             <span className="gradient-text">Amazing Together</span>
                         </h2>
                         <p className="contact-description">
-                            I'm currently looking for new opportunities. Whether you have a project
-                            in mind or just want to chat, feel free to reach out!
+                            Always ready to discuss innovative projects and architectural challenges.
+                            Let's connect and explore how we can create exceptional value together.
                         </p>
 
                         <div className="contact-details">

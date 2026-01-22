@@ -1,0 +1,449 @@
+.coding-profile {
+    background: var(--bg-secondary);
+    padding: 100px 0;
+    overflow: hidden;
+}
+
+.bento-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: repeat(2, minmax(280px, auto));
+    gap: 24px;
+    margin-top: 60px;
+}
+
+/* Base Card Style */
+.bento-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    /* For link wrappers */
+}
+
+/* Stat Cards Content */
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card-icon {
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+    transition: color 0.3s ease;
+}
+
+.bento-card:hover .card-icon {
+    color: var(--accent);
+}
+
+.card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    flex-grow: 1;
+}
+
+.card-link-icon i {
+    color: var(--text-secondary);
+    opacity: 0.5;
+    transition: all 0.3s ease;
+}
+
+.bento-card:hover .card-link-icon i {
+    opacity: 1;
+    color: var(--accent);
+    transform: translate(2px, -2px);
+}
+
+.stats-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.main-stat {
+    margin-bottom: 20px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: 4px;
+    font-family: var(--font-display);
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    display: block;
+}
+
+.stat-row {
+    display: flex;
+    gap: 24px;
+}
+
+/* Progress Bars */
+.progress-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.progress-text {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.progress-track {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1s ease-out;
+}
+
+.difficulty {
+    font-weight: 500;
+}
+
+.difficulty.easy {
+    color: #00b8a3;
+}
+
+.difficulty.medium {
+    color: #ffc01e;
+}
+
+.difficulty.hard {
+    color: #ff375f;
+}
+
+.easy-bg {
+    background: #00b8a3;
+}
+
+.medium-bg {
+    background: #ffc01e;
+}
+
+.hard-bg {
+    background: #ff375f;
+}
+
+/* Grid Specifics */
+.github-main-stats {
+    grid-column: span 8;
+    grid-row: span 1;
+    background: linear-gradient(135deg, rgba(23, 21, 21, 0.95), rgba(15, 15, 15, 0.98));
+    display: flex;
+    flex-direction: column;
+}
+
+/* GitHub Streak Layout */
+/* GitHub Graph Layout */
+.graph-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    min-height: 200px;
+    /* Ensure height for the graph */
+}
+
+.github-graph-wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: flex-end;
+}
+
+.github-graph-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.graph-point {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.graph-point:hover {
+    r: 6px;
+    filter: drop-shadow(0 0 8px #60a5fa);
+    stroke: #ffffff;
+}
+
+.loading-graph {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+.leetcode-main-stats {
+    grid-column: span 4;
+    grid-row: span 2;
+    /* Make it tall to match old layout height if desired, or span 1 mixed */
+    /* Old layout: LeetCode was span 4 row 1. Streak was span 6 row 2. */
+    /* Let's try to match the rows better. */
+    grid-row: span 1;
+    background: linear-gradient(135deg, rgba(40, 40, 40, 0.5), rgba(40, 40, 40, 0.8));
+}
+
+.github-details-stats {
+    grid-column: span 6;
+    grid-row: span 1;
+}
+
+.profiles-grid {
+    grid-column: span 6;
+    grid-row: span 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .bento-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .github-main-stats,
+    .leetcode-main-stats,
+    .github-details-stats,
+    .profiles-grid {
+        grid-column: span 2;
+    }
+}
+
+/* Profile Mini Cards */
+.profile-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-card:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--accent);
+    transform: translateY(-3px);
+}
+
+.profile-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle at top right, var(--accent-glow), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.profile-card:hover::before {
+    opacity: 1;
+}
+
+.profile-icon {
+    font-size: 2rem;
+    margin-bottom: 15px;
+    color: var(--text-secondary);
+}
+
+.profile-info h4 {
+    font-size: 1rem;
+    margin-bottom: 4px;
+    color: var(--text-primary);
+}
+
+.profile-info span {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.profile-card:hover .profile-info span {
+    color: var(--accent);
+}
+
+/* Stat Images */
+.stat-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 12px;
+}
+
+.leetcode-stat-image {
+    width: 100%;
+    /* height: 100%; */
+    /* object-fit: contain; */
+    border-radius: 12px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .bento-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: auto;
+    }
+
+    .github-stats,
+    .leetcode-stats,
+    .github-activity,
+    .profiles-grid {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .bento-grid {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .profiles-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Modern Stat Grid */
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: auto;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.stat-icon-wrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    background: rgba(255, 255, 255, 0.05);
+    flex-shrink: 0;
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-card .stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 2px;
+}
+
+.stat-card .stat-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    opacity: 0.7;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Platform Specific Styles */
+.stat-card.github .stat-icon-wrapper {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.stat-card.hackerrank .stat-icon-wrapper {
+    color: #2EC866;
+    background: rgba(46, 200, 102, 0.1);
+}
+
+.stat-card.hackerrank:hover {
+    border-color: rgba(46, 200, 102, 0.3);
+}
+
+.stat-card.codechef .stat-icon-wrapper {
+    color: #D0C9B6;
+    background: rgba(208, 201, 182, 0.1);
+}
+
+.stat-card.code360 .stat-icon-wrapper {
+    color: #FF5722;
+    background: rgba(255, 87, 34, 0.1);
+}
+
+.stat-card.geeksforgeeks .stat-icon-wrapper {
+    color: #2F8D46;
+    background: rgba(47, 141, 70, 0.1);
+}
+
+.stat-card.geeksforgeeks:hover {
+    border-color: rgba(47, 141, 70, 0.3);
+}
+
+/* Responsive adjustments for the grid */
+@media (max-width: 480px) {
+    .stat-grid {
+        grid-template-columns: 1fr;
+    }
+}

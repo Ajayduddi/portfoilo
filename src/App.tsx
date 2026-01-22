@@ -8,6 +8,7 @@ import Services from './sections/Services';
 import Projects from './sections/Projects';
 import Experience from './sections/Experience';
 import Skills from './sections/Skills';
+import CodingProfile from './sections/CodingProfile';
 import Contact from './sections/Contact';
 import Footer from './components/Footer';
 
@@ -133,6 +134,7 @@ function App() {
                 <Services />
                 <Projects />
                 <Skills />
+                <CodingProfile />
                 <Experience />
                 <Contact />
             </main>

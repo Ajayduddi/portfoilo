@@ -82,10 +82,9 @@
     font-family: var(--font-display);
     font-size: 5rem;
     font-weight: 700;
-    background: linear-gradient(135deg, var(--bg-tertiary), transparent);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.1);
+    -webkit-text-fill-color: rgba(255, 255, 255, 0.1);
     line-height: 1;
     margin-bottom: 10px;
     display: block;

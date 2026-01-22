@@ -40,7 +40,7 @@ export const DATA = {
         name: 'Ajay Duddi',
         title: 'Full Stack Developer',
         subtitle: 'Building Digital Experiences That Matter',
-        bio: 'Computer Science graduate with hands-on experience in full-stack development using React, Laravel, Angular and MySQL. Passionate about building scalable applications and solving complex problems. Currently working as a Technical Trainer while seeking opportunities to grow as a Software Developer.',
+        bio: 'Computer Science graduate with hands-on experience in full-stack ecosystems including React, Angular, Express.js, and SpringBoot. Dedicated to building scalable, high-performance applications and solving complex architectural challenges. Currently leveraging technical depth to train over 1K+ developers while actively contributing to enterprise-grade software solutions.',
         email: 'ajayduddi.work@gmail.com',
         location: 'Hyderabad, India',
         available: true,
@@ -48,11 +48,14 @@ export const DATA = {
             linkedin: 'https://www.linkedin.com/in/Ajayduddi/',
             github: 'https://github.com/Ajayduddi',
             leetcode: 'https://leetcode.com/u/Ajayduddi/',
-            code360: 'https://www.naukri.com/code360/profile/2dfd421c-a637-4508-bce2-2aa3bcabc2db'
+            code360: 'https://www.naukri.com/code360/profile/2dfd421c-a637-4508-bce2-2aa3bcabc2db',
+            hackerrank: 'https://www.hackerrank.com/profile/ajayprofessional',
+            codechef: 'https://www.codechef.com/users/ajayduddi',
+            geeksforgeeks: 'https://www.geeksforgeeks.org/profile/ajayprofesd5f1'
         },
         stats: {
-            studentsTrainted: '500+',
-            projects: '4+',
+            studentsTrainted: '1K+',
+            projects: '5+',
             technologies: '15+'
         }
     },
@@ -115,6 +118,26 @@ export const DATA = {
             color: '#10b981'
         },
         {
+            id: 'coding-club',
+            title: 'PU Coding Club',
+            description: 'Comprehensive coding club management platform facilitating student enrollment and administrative control.',
+            longDescription: 'A centralized platform designed to streamline coding club operations. Students can easily enroll in their interested tracks, while admins have full control to manage classrooms, clubs, and track attendance efficiently.',
+            tech: ['Solid.js', 'Node.js', 'MongoDB', 'Express.js'],
+            image: '/pu.codingclub.space.png',
+            link: 'https://pu.codingclub.space',
+            color: '#8b5cf6'
+        },
+        {
+            id: 'pu-code-hackathon',
+            title: 'PU Code Hackathon 3.0',
+            description: 'Official website for a 36-hour intensive coding challenge featuring 100+ problem statements across AI, Blockchain, IoT, and more.',
+            longDescription: 'Developed the official event website for PU CODE HACKATHON 3.0 - a 36-hour intensive coding challenge hosted by the Faculty of Engineering and Technology at Parul University.',
+            tech: ['React', 'TypeScript', 'Tailwind CSS'],
+            image: '/pucodehackathon.jpg',
+            link: 'https://codehackathon.paruluniversity.ac.in/',
+            color: '#f97316'
+        },
+        {
             id: 'support-board',
             title: 'Support Board',
             description: 'Enterprise ticketing system with real-time monitoring and role-based access control.',
@@ -135,6 +158,7 @@ export const DATA = {
             github: 'https://github.com/Ajayduddi/Medilab',
             color: '#ef4444'
         }
+
         // {
         //     id: 'portfolio-v1',
         //     title: 'Portfolio Website',
@@ -192,7 +216,7 @@ export const DATA = {
             company: 'University College of Engineering, JNTUK',
             duration: '2021 - 2025',
             description: [
-                'GPA: 8.13/10',
+                'GPA: 8.08/10',
                 'Focus on software development, algorithms, and system design'
             ],
             type: 'education'

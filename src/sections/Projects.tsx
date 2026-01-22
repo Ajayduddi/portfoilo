@@ -27,7 +27,7 @@ export default function Projects() {
 
                             <div className="project-content">
                                 <span className="project-number">0{index + 1}</span>
-                                <h3 className="project-title font-display">{project.title}</h3>
+                                <h3 className="project-title font-display gradient-text">{project.title}</h3>
                                 <p className="project-description">{project.longDescription || project.description}</p>
 
                                 <div className="project-tech">

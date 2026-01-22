@@ -3,7 +3,7 @@ import './About.css';
 
 export default function About() {
     return (
-        <section className="about" id="about">
+        <section className="about" id="about" style={{ paddingTop: '60px' }}>
             <div className="container">
                 <div className="about-grid">
                     {/* Left: Image */}
