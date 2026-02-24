@@ -1,4 +1,3 @@
-import React from 'react';
 import { DATA } from '../data/portfolio';
 import './Footer.css';
 
@@ -6,22 +5,22 @@ export default function Footer() {
     const year = new Date().getFullYear();
 
     return (
-        <footer className="footer">
-            <div className="container">
-                <div className="footer-content">
-                    <p className="footer-copyright">
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-content">
+                    <p class="footer-copyright">
                         © {year} {DATA.profile.name}. Crafted with passion and precision.
                     </p>
 
-                    <div className="footer-socials">
+                    <div class="footer-socials">
                         <a href={DATA.profile.socials.linkedin} target="_blank" rel="noreferrer" aria-label="LinkedIn">
-                            <i className="fab fa-linkedin-in"></i>
+                            <i class="fab fa-linkedin-in"></i>
                         </a>
                         <a href={DATA.profile.socials.github} target="_blank" rel="noreferrer" aria-label="GitHub">
-                            <i className="fab fa-github"></i>
+                            <i class="fab fa-github"></i>
                         </a>
                         <a href={DATA.profile.socials.leetcode} target="_blank" rel="noreferrer" aria-label="LeetCode">
-                            <i className="fas fa-code"></i>
+                            <i class="fas fa-code"></i>
                         </a>
                     </div>
                 </div>

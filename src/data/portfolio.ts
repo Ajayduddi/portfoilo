@@ -113,7 +113,7 @@ export const DATA = {
             description: 'AI-powered SMS assistant providing real-time, context-aware responses without internet.',
             longDescription: 'Co-developed an SMS-based conversational AI system providing real-time, context-aware responses without internet access. Integrated Google Gemini AI for natural language processing and PyAutoGUI for automated SMS handling.',
             tech: ['Python', 'Google Gemini AI', 'PyAutoGUI', 'NLP'],
-            image: '/smsgpt.jpg',
+            image: 'https://rustfs-api.ajayduddi.site/portfolio/smsgpt.jpg',
             link: 'https://smsgpt.ajayduddi.site/',
             color: '#10b981'
         },
@@ -123,7 +123,7 @@ export const DATA = {
             description: 'Comprehensive coding club management platform facilitating student enrollment and administrative control.',
             longDescription: 'A centralized platform designed to streamline coding club operations. Students can easily enroll in their interested tracks, while admins have full control to manage classrooms, clubs, and track attendance efficiently.',
             tech: ['Solid.js', 'Node.js', 'MongoDB', 'Express.js'],
-            image: '/pu.codingclub.space.png',
+            image: 'https://rustfs-api.ajayduddi.site/portfolio/pu.codingclub.space.png',
             link: 'https://pu.codingclub.space',
             color: '#8b5cf6'
         },
@@ -133,7 +133,7 @@ export const DATA = {
             description: 'Official website for a 36-hour intensive coding challenge featuring 100+ problem statements across AI, Blockchain, IoT, and more.',
             longDescription: 'Developed the official event website for PU CODE HACKATHON 3.0 - a 36-hour intensive coding challenge hosted by the Faculty of Engineering and Technology at Parul University.',
             tech: ['React', 'TypeScript', 'Tailwind CSS'],
-            image: '/pucodehackathon.jpg',
+            image: 'https://rustfs-api.ajayduddi.site/portfolio/pucodehackathon.jpg',
             link: 'https://codehackathon.paruluniversity.ac.in/',
             color: '#f97316'
         },
@@ -158,17 +158,6 @@ export const DATA = {
             github: 'https://github.com/Ajayduddi/Medilab',
             color: '#ef4444'
         }
-
-        // {
-        //     id: 'portfolio-v1',
-        //     title: 'Portfolio Website',
-        //     description: 'Modern portfolio with glassmorphism design and smooth animations.',
-        //     longDescription: 'A responsive portfolio website showcasing my projects and skills. Built with modern web technologies including HTML5, CSS3, and JavaScript with smooth animations and interactive elements.',
-        //     tech: ['HTML5', 'CSS3', 'JavaScript', 'GSAP'],
-        //     image: 'https://images.pexels.com/photos/577585/pexels-photo-577585.jpeg?auto=compress&cs=tinysrgb&w=1200',
-        //     link: 'https://ajayduddi-portfolio.netlify.app/',
-        //     color: '#8b5cf6'
-        // }
     ] as Project[],
 
     experience: [

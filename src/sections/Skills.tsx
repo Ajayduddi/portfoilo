@@ -1,13 +1,13 @@
+import { For } from 'solid-js';
 import { DATA } from '../data/portfolio';
 import './Skills.css';
 
-// Helper to render icon (supports Font Awesome or custom images)
-function SkillIcon({ icon, name }: { icon: string; name: string }) {
-    if (icon.startsWith('img:')) {
-        const src = icon.replace('img:', '');
-        return <img src={src} alt={name} className="skill-icon-img" />;
+function SkillIcon(props: { icon: string; name: string }) {
+    if (props.icon.startsWith('img:')) {
+        const src = props.icon.replace('img:', '');
+        return <img src={src} alt={props.name} class="skill-icon-img" />;
     }
-    return <i className={icon}></i>;
+    return <i class={props.icon}></i>;
 }
 
 export default function Skills() {
@@ -19,42 +19,40 @@ export default function Skills() {
     ];
 
     return (
-        <section className="skills" id="skills">
-            <div className="container">
-                <div className="section-header fade-in">
-                    <span className="section-label">Expertise</span>
-                    <h2 className="section-title font-display">Skills & Technologies</h2>
+        <section class="skills" id="skills">
+            <div class="container">
+                <div class="section-header fade-in">
+                    <span class="section-label">Expertise</span>
+                    <h2 class="section-title font-display">Skills &amp; Technologies</h2>
                 </div>
 
-                {/* Skill Categories */}
-                <div className="skills-grid fade-in">
-                    {categories.map(cat => {
+                <div class="skills-grid fade-in">
+                    <For each={categories}>{(cat) => {
                         const skills = DATA.skills.filter(s => s.category === cat.key);
                         return (
-                            <div key={cat.key} className="skill-category">
-                                <h3 className="skill-category-title">{cat.label}</h3>
-                                <div className="skill-list">
-                                    {skills.map(skill => (
-                                        <div key={skill.name} className="skill-item glass-card">
+                            <div class="skill-category">
+                                <h3 class="skill-category-title">{cat.label}</h3>
+                                <div class="skill-list">
+                                    <For each={skills}>{(skill) => (
+                                        <div class="skill-item glass-card">
                                             <SkillIcon icon={skill.icon} name={skill.name} />
                                             <span>{skill.name}</span>
                                         </div>
-                                    ))}
+                                    )}</For>
                                 </div>
                             </div>
                         );
-                    })}
+                    }}</For>
                 </div>
 
-                {/* Marquee */}
-                <div className="skills-marquee fade-in">
-                    <div className="marquee-track">
-                        {[...DATA.skills, ...DATA.skills].map((skill, index) => (
-                            <span key={`${skill.name}-${index}`} className="marquee-item">
+                <div class="skills-marquee fade-in">
+                    <div class="marquee-track">
+                        <For each={[...DATA.skills, ...DATA.skills]}>{(skill, index) => (
+                            <span class="marquee-item" data-index={index()}>
                                 <SkillIcon icon={skill.icon} name={skill.name} />
                                 {skill.name}
                             </span>
-                        ))}
+                        )}</For>
                     </div>
                 </div>
             </div>

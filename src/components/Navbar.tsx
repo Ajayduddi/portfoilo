@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import { createSignal, onMount, onCleanup, For } from 'solid-js';
 import { DATA } from '../data/portfolio';
 import './Navbar.css';
 
 export default function Navbar() {
-    const [scrolled, setScrolled] = useState(false);
-    const [menuOpen, setMenuOpen] = useState(false);
+    const [scrolled, setScrolled] = createSignal(false);
+    const [menuOpen, setMenuOpen] = createSignal(false);
 
-    useEffect(() => {
+    onMount(() => {
         const handleScroll = () => setScrolled(window.scrollY > 50);
         window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+        onCleanup(() => window.removeEventListener('scroll', handleScroll));
+    });
 
     const links = [
         { name: 'About', href: '#about' },
@@ -22,27 +22,23 @@ export default function Navbar() {
     ];
 
     return (
-        <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
-            <div className="navbar-container">
-                <a href="#" className="navbar-logo">
+        <nav class={`navbar ${scrolled() ? 'scrolled' : ''}`}>
+            <div class="navbar-container">
+                <a href="#" class="navbar-logo">
                     {DATA.profile.name.split(' ').map(n => n[0]).join('')}
                 </a>
 
-                <div className={`navbar-links ${menuOpen ? 'open' : ''}`}>
-                    {links.map(link => (
-                        <a
-                            key={link.name}
-                            href={link.href}
-                            onClick={() => setMenuOpen(false)}
-                        >
+                <div class={`navbar-links ${menuOpen() ? 'open' : ''}`}>
+                    <For each={links}>{(link) => (
+                        <a href={link.href} onClick={() => setMenuOpen(false)}>
                             {link.name}
                         </a>
-                    ))}
+                    )}</For>
                 </div>
 
                 <button
-                    className={`navbar-toggle ${menuOpen ? 'open' : ''}`}
-                    onClick={() => setMenuOpen(!menuOpen)}
+                    class={`navbar-toggle ${menuOpen() ? 'open' : ''}`}
+                    onClick={() => setMenuOpen(!menuOpen())}
                     aria-label="Toggle menu"
                 >
                     <span></span>

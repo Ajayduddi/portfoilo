@@ -1,60 +1,59 @@
-import React from 'react';
+import { For } from 'solid-js';
 import { DATA } from '../data/portfolio';
 import './Services.css';
 
-// Helper to render icon (supports Font Awesome or custom images)
-function ServiceIcon({ icon, title, color }: { icon: string; title: string; color: string }) {
-    if (icon.startsWith('img:')) {
-        const src = icon.replace('img:', '');
+function ServiceIcon(props: { icon: string; title: string; color: string }) {
+    if (props.icon.startsWith('img:')) {
+        const src = props.icon.replace('img:', '');
         return (
             <img
                 src={src}
-                alt={title}
-                className="service-icon-img"
-                style={{ filter: `drop-shadow(0 0 8px ${color}40)` }}
+                alt={props.title}
+                class="service-icon-img"
+                style={{ filter: `drop-shadow(0 0 8px ${props.color}40)` }}
             />
         );
     }
-    return <i className={icon} style={{ color }}></i>;
+    return <i class={props.icon} style={{ color: props.color }}></i>;
 }
 
 export default function Services() {
     return (
-        <section className="services" id="services">
-            <div className="container">
-                <div className="section-header fade-in">
-                    <span className="section-label">What I Offer</span>
-                    <h2 className="section-title font-display">Services</h2>
-                    <p className="section-subtitle">
+        <section class="services" id="services">
+            <div class="container">
+                <div class="section-header fade-in">
+                    <span class="section-label">What I Offer</span>
+                    <h2 class="section-title font-display">Services</h2>
+                    <p class="section-subtitle">
                         I help businesses and startups bring their ideas to life with quality code and thoughtful design.
                     </p>
                 </div>
 
-                <div className="services-grid">
-                    {DATA.services.map((service, index) => (
-                        <div key={service.id} className="service-card glass-card fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
-                            <div className="service-icon">
+                <div class="services-grid">
+                    <For each={DATA.services}>{(service, index) => (
+                        <div class="service-card glass-card fade-in" style={{ 'animation-delay': `${index() * 0.1}s` }}>
+                            <div class="service-icon">
                                 <ServiceIcon icon={service.icon} title={service.title} color={service.color} />
                             </div>
-                            <h3 className="service-title">{service.title}</h3>
-                            <p className="service-description">{service.description}</p>
-                            <ul className="service-features">
-                                {service.features.map((feature) => (
-                                    <li key={feature}>
-                                        <i className="fas fa-check"></i>
+                            <h3 class="service-title">{service.title}</h3>
+                            <p class="service-description">{service.description}</p>
+                            <ul class="service-features">
+                                <For each={service.features}>{(feature) => (
+                                    <li>
+                                        <i class="fas fa-check"></i>
                                         {feature}
                                     </li>
-                                ))}
+                                )}</For>
                             </ul>
                         </div>
-                    ))}
+                    )}</For>
                 </div>
 
-                <div className="services-cta fade-in">
+                <div class="services-cta fade-in">
                     <p>Have a project in mind?</p>
-                    <a href="#contact" className="btn btn-primary">
+                    <a href="#contact" class="btn btn-primary">
                         Let's Discuss
-                        <i className="fas fa-arrow-right"></i>
+                        <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
             </div>

@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
+import { onMount, onCleanup, createEffect } from 'solid-js';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { PortfolioProvider, usePortfolio } from './context/PortfolioContext';
 import Navbar from './components/Navbar';
 import Hero from './sections/Hero';
 import About from './sections/About';
@@ -14,119 +15,134 @@ import Footer from './components/Footer';
 
 gsap.registerPlugin(ScrollTrigger);
 
+// ─── Shared IntersectionObserver ──────────────────────────────────────────────
+// Single observer instance reused across initial mount and API refresh.
+// Adds `.visible` to .fade-in elements as they enter the viewport.
+let fadeObserver: IntersectionObserver | null = null;
+
+function createFadeObserver(): IntersectionObserver {
+    return new IntersectionObserver(
+        (entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    fadeObserver?.unobserve(entry.target); // animate once
+                }
+            });
+        },
+        { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+    );
+}
+
+/** Observe all .fade-in elements, immediately marking already-visible ones */
+function observeAll() {
+    if (!fadeObserver) return;
+    document.querySelectorAll<HTMLElement>('.fade-in').forEach(el => {
+        if (el.classList.contains('visible')) return; // already done
+        const rect = el.getBoundingClientRect();
+        if (rect.top < window.innerHeight * 0.95) {
+            el.classList.add('visible'); // in viewport — show now
+        } else {
+            fadeObserver!.observe(el);  // below viewport — watch for scroll
+        }
+    });
+}
+
+// ─── API Refresher ────────────────────────────────────────────────────────────
+// After the API data loads, SolidJS re-renders Projects/Experience DOM nodes.
+// Re-observe all current .fade-in elements so the new nodes get revealed.
+function AnimationRefresher() {
+    const { loading } = usePortfolio();
+    let didRefresh = false;
+
+    createEffect(() => {
+        if (!loading() && !didRefresh) {
+            didRefresh = true;
+            // Small delay to let SolidJS flush new DOM nodes
+            const timer = setTimeout(() => {
+                observeAll();
+
+                // Ensure all images currently visible are fully opaque
+                document.querySelectorAll<HTMLImageElement>('img').forEach(img => {
+                    const rect = img.getBoundingClientRect();
+                    if (rect.top < window.innerHeight) {
+                        gsap.set(img, { opacity: 1, scale: 1, overwrite: true });
+                    }
+                });
+
+                ScrollTrigger.refresh();
+            }, 150);
+            onCleanup(() => clearTimeout(timer));
+        }
+    });
+
+    return <></>;
+}
+
+// ─── Main App ─────────────────────────────────────────────────────────────────
 function App() {
-    useEffect(() => {
-        // Enhanced fade-in animations with stagger
-        const fadeElements = document.querySelectorAll('.fade-in');
+    onMount(() => {
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            // Create the shared IntersectionObserver
+            fadeObserver = createFadeObserver();
+            observeAll();
 
-        fadeElements.forEach((el) => {
-            gsap.fromTo(el,
-                {
-                    opacity: 0,
-                    y: 60,
-                    scale: 0.98
-                },
-                {
-                    opacity: 1,
-                    y: 0,
-                    scale: 1,
-                    duration: 1,
-                    ease: 'power3.out',
-                    scrollTrigger: {
-                        trigger: el,
-                        start: 'top 88%',
-                        end: 'top 20%',
-                        toggleActions: 'play none none none'
+            // Smooth reveal for images via GSAP ScrollTrigger
+            gsap.utils.toArray<HTMLImageElement>('img').forEach((img) => {
+                gsap.fromTo(img,
+                    { opacity: 0.6, scale: 1.05 },
+                    {
+                        opacity: 1, scale: 1, duration: 1, ease: 'power2.out',
+                        scrollTrigger: {
+                            trigger: img,
+                            start: 'top 92%',
+                            toggleActions: 'play none none none',
+                        }
                     }
-                }
-            );
-        });
-
-        // Parallax effect for section backgrounds
-        gsap.utils.toArray<HTMLElement>('.parallax-bg').forEach((bg) => {
-            gsap.to(bg, {
-                yPercent: -20,
-                ease: 'none',
-                scrollTrigger: {
-                    trigger: bg.parentElement,
-                    start: 'top bottom',
-                    end: 'bottom top',
-                    scrub: 1
-                }
-            });
-        });
-
-        // Smooth reveal for images
-        gsap.utils.toArray<HTMLImageElement>('img').forEach((img) => {
-            gsap.fromTo(img,
-                { opacity: 0.5, scale: 1.1 },
-                {
-                    opacity: 1,
-                    scale: 1,
-                    duration: 1.2,
-                    ease: 'power2.out',
-                    scrollTrigger: {
-                        trigger: img,
-                        start: 'top 90%',
-                        toggleActions: 'play none none none'
-                    }
-                }
-            );
-        });
-
-        // Animate section headers
-        gsap.utils.toArray<HTMLElement>('.section-header').forEach((header) => {
-            const label = header.querySelector('.section-label');
-            const title = header.querySelector('.section-title');
-
-            const tl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: header,
-                    start: 'top 85%'
-                }
+                );
             });
 
-            if (label) {
-                tl.fromTo(label,
-                    { opacity: 0, y: 20 },
-                    { opacity: 1, y: 0, duration: 0.6 }
-                );
-            }
-            if (title) {
-                tl.fromTo(title,
-                    { opacity: 0, y: 30, clipPath: 'inset(0 0 100% 0)' },
-                    { opacity: 1, y: 0, clipPath: 'inset(0 0 0% 0)', duration: 0.8 },
-                    '-=0.3'
-                );
-            }
-        });
+            // Parallax effect for section backgrounds
+            gsap.utils.toArray<HTMLElement>('.parallax-bg').forEach((bg) => {
+                gsap.to(bg, {
+                    yPercent: -20, ease: 'none',
+                    scrollTrigger: {
+                        trigger: bg.parentElement,
+                        start: 'top bottom', end: 'bottom top', scrub: 1
+                    }
+                });
+            });
 
-        // Navbar hide/show on scroll
-        let lastScroll = 0;
-        const navbar = document.querySelector('.navbar');
+            // Navbar hide/show on scroll
+            let lastScroll = 0;
+            const navbar = document.querySelector('.navbar');
 
-        const handleNavScroll = () => {
-            const currentScroll = window.scrollY;
-            if (navbar) {
-                if (currentScroll > lastScroll && currentScroll > 100) {
-                    navbar.classList.add('hidden');
-                } else {
-                    navbar.classList.remove('hidden');
+            const handleNavScroll = () => {
+                const currentScroll = window.scrollY;
+                if (navbar) {
+                    if (currentScroll > lastScroll && currentScroll > 100) {
+                        navbar.classList.add('hidden');
+                    } else {
+                        navbar.classList.remove('hidden');
+                    }
                 }
-            }
-            lastScroll = currentScroll;
-        };
+                lastScroll = currentScroll;
+            };
 
-        window.addEventListener('scroll', handleNavScroll, { passive: true });
+            window.addEventListener('scroll', handleNavScroll, { passive: true });
 
-        return () => {
-            ScrollTrigger.getAll().forEach(t => t.kill());
-            window.removeEventListener('scroll', handleNavScroll);
-        };
-    }, []);
+            onCleanup(() => {
+                ScrollTrigger.getAll().forEach(t => t.kill());
+                fadeObserver?.disconnect();
+                fadeObserver = null;
+                window.removeEventListener('scroll', handleNavScroll);
+            });
+        }));
+    });
 
     return (
-        <>
+        <PortfolioProvider>
+            <AnimationRefresher />
             <Navbar />
             <main>
                 <Hero />
@@ -139,7 +155,7 @@ function App() {
                 <Contact />
             </main>
             <Footer />
-        </>
+        </PortfolioProvider>
     );
 }
 

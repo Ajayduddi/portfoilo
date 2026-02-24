@@ -1,136 +1,153 @@
-import { useRef } from 'react';
+import { createSignal } from 'solid-js';
 import { DATA } from '../data/portfolio';
 import './Contact.css';
 
 export default function Contact() {
-    const formRef = useRef<HTMLFormElement>(null);
+    let formEl!: HTMLFormElement;
+    const [status, setStatus] = createSignal<'idle' | 'loading' | 'success' | 'error'>('idle');
+    const [errorMsg, setErrorMsg] = createSignal('');
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: Event) => {
         e.preventDefault();
+        setStatus('loading');
+        setErrorMsg('');
 
-        if (!formRef.current) return;
-
-        // Get form data
-        const formData = new FormData(formRef.current);
+        const formData = new FormData(formEl);
         const name = formData.get('user_name') as string;
         const email = formData.get('user_email') as string;
         const subject = formData.get('subject') as string;
         const message = formData.get('message') as string;
 
-        // Create mailto link
-        const mailtoBody = `Hi Ajay,
+        try {
+            const res = await fetch('https://n8n.ajayduddi.site/webhook/portfolioEmail', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, subject, message }),
+            });
 
-${message}
+            if (!res.ok) throw new Error(`Server responded with ${res.status}`);
 
----
-From: ${name}
-Email: ${email}`;
+            setStatus('success');
+            formEl.reset();
 
-        const mailtoLink = `mailto:${DATA.profile.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(mailtoBody)}`;
-
-        // Open user's email client
-        window.location.href = mailtoLink;
+            // Auto-reset back to form after 4 seconds
+            setTimeout(() => setStatus('idle'), 4000);
+        } catch (err: any) {
+            setStatus('error');
+            setErrorMsg(err.message || 'Something went wrong. Please try again.');
+        }
     };
 
     return (
-        <section className="contact" id="contact">
-            {/* Background glow */}
-            <div className="contact-glow"></div>
+        <section class="contact" id="contact">
+            <div class="contact-glow"></div>
 
-            <div className="container">
-                <div className="contact-wrapper">
+            <div class="container">
+                <div class="contact-wrapper">
                     {/* Left: Info */}
-                    <div className="contact-info fade-in">
-                        <span className="section-label">Get In Touch</span>
-                        <h2 className="contact-title font-display">
+                    <div class="contact-info fade-in">
+                        <span class="section-label">Get In Touch</span>
+                        <h2 class="contact-title font-display">
                             Let's Build Something<br />
-                            <span className="gradient-text">Amazing Together</span>
+                            <span class="gradient-text">Amazing Together</span>
                         </h2>
-                        <p className="contact-description">
+                        <p class="contact-description">
                             Always ready to discuss innovative projects and architectural challenges.
                             Let's connect and explore how we can create exceptional value together.
                         </p>
 
-                        <div className="contact-details">
-                            <a href={`mailto:${DATA.profile.email}`} className="contact-detail-item">
-                                <i className="fas fa-envelope"></i>
+                        <div class="contact-details">
+                            <a href={`mailto:${DATA.profile.email}`} class="contact-detail-item">
+                                <i class="fas fa-envelope"></i>
                                 <span>{DATA.profile.email}</span>
                             </a>
-                            <div className="contact-detail-item">
-                                <i className="fas fa-map-marker-alt"></i>
+                            <div class="contact-detail-item">
+                                <i class="fas fa-map-marker-alt"></i>
                                 <span>{DATA.profile.location}</span>
                             </div>
                         </div>
 
-                        <div className="contact-socials">
+                        <div class="contact-socials">
                             <a href={DATA.profile.socials.linkedin} target="_blank" rel="noreferrer" aria-label="LinkedIn">
-                                <i className="fab fa-linkedin-in"></i>
+                                <i class="fab fa-linkedin-in"></i>
                             </a>
                             <a href={DATA.profile.socials.github} target="_blank" rel="noreferrer" aria-label="GitHub">
-                                <i className="fab fa-github"></i>
+                                <i class="fab fa-github"></i>
                             </a>
                             <a href={DATA.profile.socials.leetcode} target="_blank" rel="noreferrer" aria-label="LeetCode">
-                                <i className="fas fa-code"></i>
+                                <i class="fas fa-code"></i>
                             </a>
                         </div>
                     </div>
 
-                    {/* Right: Form */}
-                    <div className="contact-form-wrapper fade-in">
-                        <form ref={formRef} onSubmit={handleSubmit} className="contact-form glass-card">
-                            <div className="form-group">
-                                <label htmlFor="user_name">Your Name</label>
-                                <input
-                                    type="text"
-                                    id="user_name"
-                                    name="user_name"
-                                    required
-                                    placeholder="John Doe"
-                                />
-                            </div>
+                    {/* Right: Form card */}
+                    <div class="contact-form-wrapper fade-in">
+                        <div class="contact-form glass-card">
 
-                            <div className="form-group">
-                                <label htmlFor="user_email">Email Address</label>
-                                <input
-                                    type="email"
-                                    id="user_email"
-                                    name="user_email"
-                                    required
-                                    placeholder="john@example.com"
-                                />
-                            </div>
+                            {/* ── SUCCESS STATE ── */}
+                            {status() === 'success' ? (
+                                <div class="inline-success">
+                                    {/* Ripple rings */}
+                                    <div class="ripple-ring ring-1" />
+                                    <div class="ripple-ring ring-2" />
+                                    <div class="ripple-ring ring-3" />
 
-                            <div className="form-group">
-                                <label htmlFor="subject">Subject</label>
-                                <input
-                                    type="text"
-                                    id="subject"
-                                    name="subject"
-                                    required
-                                    placeholder="Project Inquiry"
-                                />
-                            </div>
+                                    {/* Animated SVG checkmark */}
+                                    <div class="success-icon-wrap">
+                                        <svg class="success-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                            <circle class="success-circle" cx="50" cy="50" r="44" />
+                                            <polyline class="success-check" points="26,52 42,68 74,34" />
+                                        </svg>
+                                    </div>
 
-                            <div className="form-group">
-                                <label htmlFor="message">Message</label>
-                                <textarea
-                                    id="message"
-                                    name="message"
-                                    rows={5}
-                                    required
-                                    placeholder="Tell me about your project..."
-                                ></textarea>
-                            </div>
+                                    <h2 class="success-title">Message Sent!</h2>
+                                    <p class="success-subtitle">
+                                        Thanks for reaching out.<br />I'll get back to you soon 🚀
+                                    </p>
 
-                            <button
-                                type="submit"
-                                className="contact-submit-btn"
-                            >
-                                Send Message
-                                <i className="fas fa-envelope-open"></i>
-                            </button>
+                                    <button class="success-close-btn" onClick={() => setStatus('idle')}>
+                                        Send Another
+                                    </button>
+                                </div>
+                            ) : (
+                                /* ── FORM STATE ── */
+                                <form ref={formEl} onSubmit={handleSubmit} class="inner-form">
+                                    <div class="form-group">
+                                        <label for="user_name">Your Name</label>
+                                        <input type="text" id="user_name" name="user_name" required placeholder="John Doe" />
+                                    </div>
 
-                        </form>
+                                    <div class="form-group">
+                                        <label for="user_email">Email Address</label>
+                                        <input type="email" id="user_email" name="user_email" required placeholder="john@example.com" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="subject">Subject</label>
+                                        <input type="text" id="subject" name="subject" required placeholder="Project Inquiry" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="message">Message</label>
+                                        <textarea id="message" name="message" rows={5} required placeholder="Tell me about your project..."></textarea>
+                                    </div>
+
+                                    {status() === 'error' && (
+                                        <p class="form-feedback form-error">
+                                            <i class="fas fa-exclamation-circle"></i> {errorMsg()}
+                                        </p>
+                                    )}
+
+                                    <button type="submit" class="contact-submit-btn" disabled={status() === 'loading'}>
+                                        {status() === 'loading' ? (
+                                            <>Sending… <i class="fas fa-spinner fa-spin"></i></>
+                                        ) : (
+                                            <>Send Message <i class="fas fa-envelope-open"></i></>
+                                        )}
+                                    </button>
+                                </form>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
