@@ -16,6 +16,7 @@ export default function About() {
     const studentsTrained = createMemo(() => getStatValue('studentsTrained', DATA.profile.stats.studentsTrainted));
     const projects = createMemo(() => getStatValue('projects', DATA.profile.stats.projects));
     const technologies = createMemo(() => getStatValue('technologies', DATA.profile.stats.technologies));
+    const bio = createMemo(() => portfolioData()?.profile?.bio?.trim() || DATA.profile.bio);
     const photoSrc = createMemo(() => portfolioData()?.profile?.image ?? '/photo.jpg');
 
     return (
@@ -49,7 +50,7 @@ export default function About() {
                             Turning Ideas Into<br />
                             <span class="gradient-text">Digital Reality</span>
                         </h2>
-                        <p class="about-bio">{DATA.profile.bio}</p>
+                        <p class="about-bio">{bio()}</p>
 
                         {/* Stats */}
                         <div class="about-stats">

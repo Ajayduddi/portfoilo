@@ -84,6 +84,14 @@ export const DATA = {
             description: 'RESTful APIs and backend services that power your applications. Clean, documented, and built for reliability and scalability.',
             features: ['RESTful Design', 'Documentation', 'Security', 'Performance'],
             color: '#339933'
+        },
+        {
+            id: 'training-workshops',
+            icon: 'fas fa-chalkboard-teacher',
+            title: 'Training & Workshops',
+            description: 'Hands-on technical training for students, teams, and developer communities covering full-stack development, Agentic AI workflows, and real-world project building.',
+            features: ['Agentic AI', 'Java Full Stack', 'React / Angular', 'Hands-on Labs'],
+            color: '#f59e0b'
         }
     ] as Service[],
 
@@ -103,6 +111,8 @@ export const DATA = {
         { name: 'MySQL', icon: 'img:/icons/mysql.svg', category: 'backend' },
         { name: 'MongoDB', icon: 'img:/icons/mongodb.svg', category: 'backend' },
         { name: 'Git', icon: 'img:/icons/git.svg', category: 'tools' },
+        { name: 'n8n', icon: 'img:/icons/n8n.svg', category: 'tools' },
+        { name: 'Sim', icon: 'img:/icons/sim.svg', category: 'tools' },
         { name: 'Figma', icon: 'img:/icons/figma.svg', category: 'tools' }
     ] as Skill[],
 

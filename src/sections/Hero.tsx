@@ -1,14 +1,29 @@
+import { createMemo } from 'solid-js';
 import { DATA } from '../data/portfolio';
+import { usePortfolio } from '../context/PortfolioContext';
 import { HeroGeometric } from '@/components/ui/shape-landing-hero';
 
 export default function Hero() {
+    const { portfolioData } = usePortfolio();
+
+    const studentsTrained = createMemo(() => {
+        const entry = portfolioData()?.stats?.find(
+            s => s.Name.trim().toLowerCase() === 'studentstrained'
+        );
+        return entry?.value ?? DATA.profile.stats.studentsTrainted;
+    });
+
+    const description = createMemo(() =>
+        `Architecting scalable web ecosystems and mentoring the next generation of developers. Empowering ${studentsTrained()} students to master full-stack excellence.`
+    );
+
     return (
         <section id="hero" style={{ padding: '0' }}>
             <HeroGeometric
                 badge={DATA.profile.title}
                 title1={DATA.profile.name}
                 title2="Building Future Tech"
-                description="Architecting scalable web ecosystems and mentoring the next generation of developers. Empowering 1K+ students to master full-stack excellence."
+                description={description()}
             >
                 <div class="flex flex-col sm:flex-row justify-center gap-4 mt-8">
                     <a
