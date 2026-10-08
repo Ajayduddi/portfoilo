@@ -82,21 +82,18 @@
 }
 
 .about-title {
-    font-size: clamp(2rem, 4vw, 3.5rem);
     margin-bottom: 24px;
     line-height: 1.2;
 }
 
 .about-bio {
-    color: var(--text-secondary);
-    font-size: 1.1rem;
-    line-height: 1.8;
     margin-bottom: 40px;
 }
 
 /* Stats */
 .about-stats {
     display: flex;
+    justify-content: space-around;
     gap: 40px;
     margin-bottom: 40px;
     padding: 24px 0;
@@ -104,14 +101,14 @@
     border-bottom: 1px solid var(--glass-border);
 }
 
-.stat-item {
+.about .stat-item {
     display: flex;
     flex-direction: column;
     gap: 4px;
     position: relative;
 }
 
-.stat-number {
+.about .stat-number {
     font-size: 2.5rem;
     font-weight: 700;
     color: var(--text-primary);
@@ -121,9 +118,9 @@
     background-clip: text;
 }
 
-.stat-label {
+.about .stat-label {
     font-size: 0.85rem;
-    color: var(--text-muted);
+    color: var(--text-secondary);
 }
 
 /* Contact */
@@ -197,10 +194,6 @@
         right: 0;
     }
 
-    .about-stats {
-        justify-content: space-between;
-    }
-
     .about-content {
         text-align: center;
     }
@@ -214,6 +207,18 @@
     }
 }
 
+@media (min-width: 600px) and (max-width: 1023px) {
+    .about-image-badge {
+        right: 0;
+    }
+}
+
+@media (min-width: 600px) and (max-width: 900px) {
+    .about-image-badge {
+        right: max(0px, calc((100% - 350px) / 2));
+    }
+}
+
 @media (max-width: 480px) {
     .about-stats {
         flex-direction: column;
@@ -221,7 +226,7 @@
         gap: 24px;
     }
 
-    .stat-item {
+    .about .stat-item {
         text-align: center;
     }
 

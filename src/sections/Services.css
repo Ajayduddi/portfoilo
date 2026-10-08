@@ -21,7 +21,8 @@
     margin-bottom: 60px;
 }
 
-.service-card {
+.service-card.glass-card {
+    height: 100%;
     padding: 40px 34px;
     text-align: center;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -45,7 +46,7 @@
     transform: scaleX(1);
 }
 
-.service-card:hover {
+.service-card.glass-card:hover {
     transform: translateY(-15px);
     border-color: var(--accent);
     box-shadow: 0 20px 60px rgba(100, 108, 255, 0.15);
@@ -161,7 +162,7 @@
         margin-right: auto;
     }
 
-    .service-card {
+    .service-card.glass-card {
         padding: 35px 25px;
     }
 }

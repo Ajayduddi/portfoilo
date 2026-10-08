@@ -1,5 +1,6 @@
 import { render } from 'solid-js/web';
 import App from './App';
+import { MotionProvider } from './context/MotionContext';
 import './styles/index.css';
 
-render(() => <App />, document.getElementById('root')!);
+render(() => <MotionProvider><App /></MotionProvider>, document.getElementById('root')!);

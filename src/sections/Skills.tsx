@@ -23,20 +23,22 @@ export default function Skills() {
             <div class="container">
                 <div class="section-header fade-in">
                     <span class="section-label">Expertise</span>
-                    <h2 class="section-title font-display">Skills &amp; Technologies</h2>
+                    <h2 class="section-title font-display">Skills &amp; <span class="gradient-text">Technologies</span></h2>
                 </div>
 
-                <div class="skills-grid fade-in">
-                    <For each={categories}>{(cat) => {
+                <div class="skills-grid">
+                    <For each={categories}>{(cat, categoryIndex) => {
                         const skills = DATA.skills.filter(s => s.category === cat.key);
                         return (
                             <div class="skill-category">
-                                <h3 class="skill-category-title">{cat.label}</h3>
+                                <h3 class="skill-category-title fade-in" style={{ '--reveal-delay': `${categoryIndex() * 0.08}s` }}>{cat.label}</h3>
                                 <div class="skill-list">
-                                    <For each={skills}>{(skill) => (
-                                        <div class="skill-item glass-card">
-                                            <SkillIcon icon={skill.icon} name={skill.name} />
-                                            <span>{skill.name}</span>
+                                    <For each={skills}>{(skill, index) => (
+                                        <div class="skill-reveal fade-in" style={{ '--reveal-delay': `${categoryIndex() * 0.08 + index() * 0.07}s` }}>
+                                            <div class="skill-item glass-card">
+                                                <SkillIcon icon={skill.icon} name={skill.name} />
+                                                <span>{skill.name}</span>
+                                            </div>
                                         </div>
                                     )}</For>
                                 </div>
@@ -47,11 +49,15 @@ export default function Skills() {
 
                 <div class="skills-marquee fade-in">
                     <div class="marquee-track">
-                        <For each={[...DATA.skills, ...DATA.skills]}>{(skill, index) => (
-                            <span class="marquee-item" data-index={index()}>
-                                <SkillIcon icon={skill.icon} name={skill.name} />
-                                {skill.name}
-                            </span>
+                        <For each={[false, true]}>{duplicate => (
+                            <div class="marquee-group" aria-hidden={duplicate ? 'true' : undefined}>
+                                <For each={DATA.skills}>{skill => (
+                                    <span class="marquee-item">
+                                        <SkillIcon icon={skill.icon} name={skill.name} />
+                                        {skill.name}
+                                    </span>
+                                )}</For>
+                            </div>
                         )}</For>
                     </div>
                 </div>

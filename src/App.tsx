@@ -16,34 +16,33 @@ import Footer from './components/Footer';
 gsap.registerPlugin(ScrollTrigger);
 
 // ─── Shared IntersectionObserver ──────────────────────────────────────────────
-// Single observer instance reused across initial mount and API refresh.
+// One observer per mounted App, reused across initial mount and API refresh.
 // Adds `.visible` to .fade-in elements as they enter the viewport.
-let fadeObserver: IntersectionObserver | null = null;
-
 function createFadeObserver(): IntersectionObserver {
-    return new IntersectionObserver(
+    const observer = new IntersectionObserver(
         (entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('visible');
-                    fadeObserver?.unobserve(entry.target); // animate once
+                    observer.unobserve(entry.target); // animate once
                 }
             });
         },
-        { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+        { threshold: 0, rootMargin: '0px 0px -40px 0px' }
     );
+    return observer;
 }
 
 /** Observe all .fade-in elements, immediately marking already-visible ones */
-function observeAll() {
-    if (!fadeObserver) return;
+function observeAll(observer: IntersectionObserver | undefined) {
+    if (!observer) return;
     document.querySelectorAll<HTMLElement>('.fade-in').forEach(el => {
         if (el.classList.contains('visible')) return; // already done
         const rect = el.getBoundingClientRect();
-        if (rect.top < window.innerHeight * 0.95) {
+        if (rect.top < window.innerHeight - 40) {
             el.classList.add('visible'); // in viewport — show now
         } else {
-            fadeObserver!.observe(el);  // below viewport — watch for scroll
+            observer.observe(el);  // below viewport — watch for scroll
         }
     });
 }
@@ -51,28 +50,27 @@ function observeAll() {
 // ─── API Refresher ────────────────────────────────────────────────────────────
 // After the API data loads, SolidJS re-renders Projects/Experience DOM nodes.
 // Re-observe all current .fade-in elements so the new nodes get revealed.
-function AnimationRefresher() {
+function AnimationRefresher(props: { refresh: () => void }) {
     const { loading } = usePortfolio();
     let didRefresh = false;
 
     createEffect(() => {
         if (!loading() && !didRefresh) {
             didRefresh = true;
-            // Small delay to let SolidJS flush new DOM nodes
-            const timer = setTimeout(() => {
-                observeAll();
-
-                // Ensure all images currently visible are fully opaque
-                document.querySelectorAll<HTMLImageElement>('img').forEach(img => {
-                    const rect = img.getBoundingClientRect();
-                    if (rect.top < window.innerHeight) {
-                        gsap.set(img, { opacity: 1, scale: 1, overwrite: true });
-                    }
+            let firstFrame: number | undefined;
+            let secondFrame: number | undefined;
+            firstFrame = requestAnimationFrame(() => {
+                firstFrame = undefined;
+                secondFrame = requestAnimationFrame(() => {
+                    secondFrame = undefined;
+                    props.refresh();
+                    ScrollTrigger.refresh();
                 });
-
-                ScrollTrigger.refresh();
-            }, 150);
-            onCleanup(() => clearTimeout(timer));
+            });
+            onCleanup(() => {
+                if (firstFrame !== undefined) cancelAnimationFrame(firstFrame);
+                if (secondFrame !== undefined) cancelAnimationFrame(secondFrame);
+            });
         }
     });
 
@@ -81,68 +79,32 @@ function AnimationRefresher() {
 
 // ─── Main App ─────────────────────────────────────────────────────────────────
 function App() {
+    let observer: IntersectionObserver | undefined;
+    let firstFrame: number | undefined;
+    let secondFrame: number | undefined;
+
+    // Register cleanup synchronously with the component owner, not inside a frame callback.
+    onCleanup(() => {
+        if (firstFrame !== undefined) cancelAnimationFrame(firstFrame);
+        if (secondFrame !== undefined) cancelAnimationFrame(secondFrame);
+        observer?.disconnect();
+    });
+
     onMount(() => {
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-            // Create the shared IntersectionObserver
-            fadeObserver = createFadeObserver();
-            observeAll();
-
-            // Smooth reveal for images via GSAP ScrollTrigger
-            gsap.utils.toArray<HTMLImageElement>('img').forEach((img) => {
-                gsap.fromTo(img,
-                    { opacity: 0.6, scale: 1.05 },
-                    {
-                        opacity: 1, scale: 1, duration: 1, ease: 'power2.out',
-                        scrollTrigger: {
-                            trigger: img,
-                            start: 'top 92%',
-                            toggleActions: 'play none none none',
-                        }
-                    }
-                );
+        firstFrame = requestAnimationFrame(() => {
+            firstFrame = undefined;
+            secondFrame = requestAnimationFrame(() => {
+                secondFrame = undefined;
+                // Create the shared IntersectionObserver
+                observer = createFadeObserver();
+                observeAll(observer);
             });
-
-            // Parallax effect for section backgrounds
-            gsap.utils.toArray<HTMLElement>('.parallax-bg').forEach((bg) => {
-                gsap.to(bg, {
-                    yPercent: -20, ease: 'none',
-                    scrollTrigger: {
-                        trigger: bg.parentElement,
-                        start: 'top bottom', end: 'bottom top', scrub: 1
-                    }
-                });
-            });
-
-            // Navbar hide/show on scroll
-            let lastScroll = 0;
-            const navbar = document.querySelector('.navbar');
-
-            const handleNavScroll = () => {
-                const currentScroll = window.scrollY;
-                if (navbar) {
-                    if (currentScroll > lastScroll && currentScroll > 100) {
-                        navbar.classList.add('hidden');
-                    } else {
-                        navbar.classList.remove('hidden');
-                    }
-                }
-                lastScroll = currentScroll;
-            };
-
-            window.addEventListener('scroll', handleNavScroll, { passive: true });
-
-            onCleanup(() => {
-                ScrollTrigger.getAll().forEach(t => t.kill());
-                fadeObserver?.disconnect();
-                fadeObserver = null;
-                window.removeEventListener('scroll', handleNavScroll);
-            });
-        }));
+        });
     });
 
     return (
         <PortfolioProvider>
-            <AnimationRefresher />
+            <AnimationRefresher refresh={() => observeAll(observer)} />
             <Navbar />
             <main>
                 <Hero />

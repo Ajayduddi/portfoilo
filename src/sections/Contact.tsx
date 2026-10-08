@@ -1,40 +1,61 @@
-import { createSignal } from 'solid-js';
+import { createSignal, onCleanup } from 'solid-js';
 import { DATA } from '../data/portfolio';
+import { sendContactMessage } from '../services/portfolioApi';
+import { CONTACT_LIMITS, ContactValidationError } from '../lib/contactValidation';
+import { HttpError } from '../lib/request';
 import './Contact.css';
 
 export default function Contact() {
     let formEl!: HTMLFormElement;
     const [status, setStatus] = createSignal<'idle' | 'loading' | 'success' | 'error'>('idle');
     const [errorMsg, setErrorMsg] = createSignal('');
+    let controller: AbortController | undefined;
+    let resetTimer: ReturnType<typeof setTimeout> | undefined;
+    let disposed = false;
+
+    const resetStatus = () => {
+        clearTimeout(resetTimer);
+        resetTimer = undefined;
+        setStatus('idle');
+    };
+
+    onCleanup(() => {
+        disposed = true;
+        controller?.abort();
+        clearTimeout(resetTimer);
+    });
 
     const handleSubmit = async (e: Event) => {
         e.preventDefault();
+        if (status() === 'loading' || !formEl.reportValidity()) return;
+        clearTimeout(resetTimer);
+        const formData = new FormData(formEl);
+        const field = (key: string) => {
+            const value = formData.get(key);
+            return typeof value === 'string' ? value : '';
+        };
+        const name = field('user_name'), email = field('user_email'), subject = field('subject'), message = field('message');
+        controller = new AbortController();
         setStatus('loading');
         setErrorMsg('');
 
-        const formData = new FormData(formEl);
-        const name = formData.get('user_name') as string;
-        const email = formData.get('user_email') as string;
-        const subject = formData.get('subject') as string;
-        const message = formData.get('message') as string;
-
         try {
-            const res = await fetch('https://n8n.ajayduddi.site/webhook/portfolioEmail', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, subject, message }),
-            });
-
-            if (!res.ok) throw new Error(`Server responded with ${res.status}`);
-
+            await sendContactMessage({ name, email, subject, message }, controller.signal);
+            if (disposed) return;
             setStatus('success');
             formEl.reset();
 
             // Auto-reset back to form after 4 seconds
-            setTimeout(() => setStatus('idle'), 4000);
-        } catch (err: any) {
+            resetTimer = setTimeout(resetStatus, 4000);
+        } catch (err: unknown) {
+            if (disposed) return;
             setStatus('error');
-            setErrorMsg(err.message || 'Something went wrong. Please try again.');
+            setErrorMsg(err instanceof ContactValidationError ? err.message :
+                err instanceof HttpError && err.status === 429 ? 'Too many attempts. Please try again later.' :
+                err instanceof DOMException && err.name === 'TimeoutError' ? 'The request timed out. Please try again.' :
+                'Your message could not be sent. Please try again.');
+        } finally {
+            controller = undefined;
         }
     };
 
@@ -45,18 +66,20 @@ export default function Contact() {
             <div class="container">
                 <div class="contact-wrapper">
                     {/* Left: Info */}
-                    <div class="contact-info fade-in">
-                        <span class="section-label">Get In Touch</span>
-                        <h2 class="contact-title font-display">
-                            Let's Build Something<br />
-                            <span class="gradient-text">Amazing Together</span>
-                        </h2>
-                        <p class="contact-description">
+                    <div class="contact-info">
+                        <div class="fade-in">
+                            <span class="section-label">Get In Touch</span>
+                            <h2 class="contact-title section-title font-display">
+                                Let's Build Something<br />
+                                <span class="gradient-text">Amazing Together</span>
+                            </h2>
+                        </div>
+                        <p class="contact-description section-description fade-in stagger-1">
                             Always ready to discuss innovative projects and architectural challenges.
                             Let's connect and explore how we can create exceptional value together.
                         </p>
 
-                        <div class="contact-details">
+                        <div class="contact-details fade-in stagger-2">
                             <a href={`mailto:${DATA.profile.email}`} class="contact-detail-item">
                                 <i class="fas fa-envelope"></i>
                                 <span>{DATA.profile.email}</span>
@@ -67,7 +90,7 @@ export default function Contact() {
                             </div>
                         </div>
 
-                        <div class="contact-socials">
+                        <div class="contact-socials fade-in stagger-3">
                             <a href={DATA.profile.socials.linkedin} target="_blank" rel="noreferrer" aria-label="LinkedIn">
                                 <i class="fab fa-linkedin-in"></i>
                             </a>
@@ -86,7 +109,7 @@ export default function Contact() {
 
                             {/* ── SUCCESS STATE ── */}
                             {status() === 'success' ? (
-                                <div class="inline-success">
+                                <div class="inline-success" role="status">
                                     {/* Ripple rings */}
                                     <div class="ripple-ring ring-1" />
                                     <div class="ripple-ring ring-2" />
@@ -94,7 +117,7 @@ export default function Contact() {
 
                                     {/* Animated SVG checkmark */}
                                     <div class="success-icon-wrap">
-                                        <svg class="success-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                        <svg class="success-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                             <circle class="success-circle" cx="50" cy="50" r="44" />
                                             <polyline class="success-check" points="26,52 42,68 74,34" />
                                         </svg>
@@ -105,35 +128,35 @@ export default function Contact() {
                                         Thanks for reaching out.<br />I'll get back to you soon 🚀
                                     </p>
 
-                                    <button class="success-close-btn" onClick={() => setStatus('idle')}>
+                                    <button class="success-close-btn" onClick={resetStatus}>
                                         Send Another
                                     </button>
                                 </div>
                             ) : (
                                 /* ── FORM STATE ── */
-                                <form ref={formEl} onSubmit={handleSubmit} class="inner-form">
+                                <form ref={formEl} onSubmit={handleSubmit} class="inner-form" aria-busy={status() === 'loading'}>
                                     <div class="form-group">
                                         <label for="user_name">Your Name</label>
-                                        <input type="text" id="user_name" name="user_name" required placeholder="John Doe" />
+                                        <input type="text" id="user_name" name="user_name" required maxlength={CONTACT_LIMITS.name} disabled={status() === 'loading'} placeholder="John Doe" />
                                     </div>
 
                                     <div class="form-group">
                                         <label for="user_email">Email Address</label>
-                                        <input type="email" id="user_email" name="user_email" required placeholder="john@example.com" />
+                                        <input type="email" id="user_email" name="user_email" required maxlength={CONTACT_LIMITS.email} disabled={status() === 'loading'} placeholder="john@example.com" />
                                     </div>
 
                                     <div class="form-group">
                                         <label for="subject">Subject</label>
-                                        <input type="text" id="subject" name="subject" required placeholder="Project Inquiry" />
+                                        <input type="text" id="subject" name="subject" required maxlength={CONTACT_LIMITS.subject} disabled={status() === 'loading'} placeholder="Project Inquiry" />
                                     </div>
 
                                     <div class="form-group">
                                         <label for="message">Message</label>
-                                        <textarea id="message" name="message" rows={5} required placeholder="Tell me about your project..."></textarea>
+                                        <textarea id="message" name="message" rows={5} required maxlength={CONTACT_LIMITS.message} disabled={status() === 'loading'} placeholder="Tell me about your project..."></textarea>
                                     </div>
 
                                     {status() === 'error' && (
-                                        <p class="form-feedback form-error">
+                                        <p class="form-feedback form-error" role="alert">
                                             <i class="fas fa-exclamation-circle"></i> {errorMsg()}
                                         </p>
                                     )}

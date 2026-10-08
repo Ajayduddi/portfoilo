@@ -1,4 +1,4 @@
-import { createContext, useContext, createSignal, onMount, type JSX } from 'solid-js';
+import { createContext, useContext, createSignal, onMount, onCleanup, type JSX } from 'solid-js';
 import {
     fetchPortfolioData,
     fetchLeetcodeStats,
@@ -32,16 +32,20 @@ export function PortfolioProvider(props: { children: JSX.Element }) {
     const [portfolioData, setPortfolioData] = createSignal<PortfolioApiResponse | null>(null);
     const [leetcodeStats, setLeetcodeStats] = createSignal<LeetcodeStats | null>(null);
     const [codechefData, setCodechefData] = createSignal<CodechefApiResponse | null>(null);
+    const controller = new AbortController();
+    onCleanup(() => controller.abort());
 
     onMount(async () => {
         setLoading(true);
 
         const [portfolioResult, leetcodeResult, codechefResult] =
             await Promise.allSettled([
-                fetchPortfolioData(),
-                fetchLeetcodeStats(),
-                fetchCodechefStats(),
+                fetchPortfolioData(controller.signal),
+                fetchLeetcodeStats(controller.signal),
+                fetchCodechefStats(controller.signal),
             ]);
+
+        if (controller.signal.aborted) return;
 
         if (portfolioResult.status === 'fulfilled' && portfolioResult.value) {
             const data = portfolioResult.value;

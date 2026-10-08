@@ -16,7 +16,7 @@
     padding: 14px 0;
 }
 
-.navbar.hidden {
+.navbar.navbar--hidden {
     transform: translateY(-100%);
 }
 
@@ -48,14 +48,14 @@
     gap: 32px;
 }
 
-.navbar-links a:not(.navbar-cta) {
+.navbar-links a {
     font-size: 0.9rem;
     color: var(--text-secondary);
-    transition: all var(--transition-normal);
+    transition: color var(--transition-normal);
     position: relative;
 }
 
-.navbar-links a:not(.navbar-cta)::after {
+.navbar-links a::after {
     content: '';
     position: absolute;
     bottom: -4px;
@@ -66,26 +66,12 @@
     transition: width var(--transition-normal);
 }
 
-.navbar-links a:not(.navbar-cta):hover {
+.navbar-links a:hover {
     color: var(--text-primary);
 }
 
-.navbar-links a:not(.navbar-cta):hover::after {
+.navbar-links a:hover::after {
     width: 100%;
-}
-
-.navbar-cta {
-    padding: 10px 20px;
-    font-size: 0.85rem;
-    background: var(--accent);
-    color: white;
-    border-radius: 8px;
-}
-
-.navbar-cta:hover {
-    background: #5558e0;
-    color: white;
-    transform: translateY(-2px);
 }
 
 .navbar-toggle {
@@ -133,27 +119,23 @@
         gap: 32px;
         opacity: 0;
         visibility: hidden;
-        transition: all 0.4s ease;
+        transition: opacity 0.4s ease, visibility 0s linear 0.4s;
     }
 
     .navbar-links.open {
         opacity: 1;
         visibility: visible;
+        transition-delay: 0s;
     }
 
-    .navbar-links a:not(.navbar-cta) {
+    .navbar-links a {
         font-size: 1.8rem;
         font-weight: 500;
     }
 
-    .navbar-links a:not(.navbar-cta)::after {
+    .navbar-links a::after {
         bottom: -8px;
         height: 3px;
-    }
-
-    .navbar-cta {
-        padding: 16px 40px;
-        font-size: 1rem;
     }
 
     .navbar-toggle {

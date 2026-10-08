@@ -2,8 +2,13 @@ node_modules
 .zencoder
 .DS_Store
 .env
+.env.*
+!.env.example
+dist/
 .idea
-.vscode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tailwindcss.custom-data.json
 *.log
 *.tmp
 *.bak

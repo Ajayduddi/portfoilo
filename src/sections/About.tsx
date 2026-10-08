@@ -1,6 +1,8 @@
 import { createMemo } from 'solid-js';
 import { DATA } from '../data/portfolio';
 import { usePortfolio } from '../context/PortfolioContext';
+import ImageWithFallback from '../components/ImageWithFallback';
+import { safeImageUrl } from '../lib/urls';
 import './About.css';
 
 export default function About() {
@@ -17,7 +19,7 @@ export default function About() {
     const projects = createMemo(() => getStatValue('projects', DATA.profile.stats.projects));
     const technologies = createMemo(() => getStatValue('technologies', DATA.profile.stats.technologies));
     const bio = createMemo(() => portfolioData()?.profile?.bio?.trim() || DATA.profile.bio);
-    const photoSrc = createMemo(() => portfolioData()?.profile?.image ?? '/photo.jpg');
+    const photoSrc = createMemo(() => safeImageUrl(portfolioData()?.profile?.image));
 
     return (
         <section class="about" id="about" style={{ 'padding-top': '60px' }}>
@@ -26,14 +28,11 @@ export default function About() {
                     {/* Left: Image */}
                     <div class="about-image fade-in">
                         <div class="about-image-wrapper">
-                            <img
+                            <ImageWithFallback
                                 src={photoSrc()}
                                 alt={DATA.profile.name}
-                                referrerpolicy="no-referrer"
-                                onError={(e) => {
-                                    const el = e.currentTarget as HTMLImageElement;
-                                    if (!el.src.endsWith('/photo.jpg')) el.src = '/photo.jpg';
-                                }}
+                                loading="eager"
+                                fallbackLabel="Photo unavailable"
                             />
                             <div class="about-image-overlay"></div>
                         </div>
@@ -44,32 +43,34 @@ export default function About() {
                     </div>
 
                     {/* Right: Content */}
-                    <div class="about-content fade-in">
-                        <span class="section-label">About Me</span>
-                        <h2 class="about-title font-display">
-                            Turning Ideas Into<br />
-                            <span class="gradient-text">Digital Reality</span>
-                        </h2>
-                        <p class="about-bio">{bio()}</p>
+                    <div class="about-content">
+                        <div class="fade-in">
+                            <span class="section-label">About Me</span>
+                            <h2 class="about-title section-title font-display">
+                                Turning Ideas Into<br />
+                                <span class="gradient-text">Digital Reality</span>
+                            </h2>
+                        </div>
+                        <p class="about-bio section-description fade-in stagger-1">{bio()}</p>
 
                         {/* Stats */}
                         <div class="about-stats">
-                            <div class="stat-item">
+                            <div class="stat-item fade-in stagger-1">
                                 <span class="stat-number">{studentsTrained()}</span>
                                 <span class="stat-label">Students Trained</span>
                             </div>
-                            <div class="stat-item">
+                            <div class="stat-item fade-in stagger-2">
                                 <span class="stat-number">{projects()}</span>
                                 <span class="stat-label">Projects Built</span>
                             </div>
-                            <div class="stat-item">
+                            <div class="stat-item fade-in stagger-3">
                                 <span class="stat-number">{technologies()}</span>
                                 <span class="stat-label">Technologies</span>
                             </div>
                         </div>
 
                         {/* Contact Info */}
-                        <div class="about-contact">
+                        <div class="about-contact fade-in stagger-2">
                             <a href={`mailto:${DATA.profile.email}`} class="contact-link">
                                 <i class="fas fa-envelope"></i>
                                 <span>{DATA.profile.email}</span>
@@ -81,7 +82,7 @@ export default function About() {
                         </div>
 
                         {/* Social Links */}
-                        <div class="about-socials">
+                        <div class="about-socials fade-in stagger-3">
                             <a href={DATA.profile.socials.linkedin} target="_blank" rel="noreferrer" aria-label="LinkedIn">
                                 <i class="fab fa-linkedin-in"></i>
                             </a>

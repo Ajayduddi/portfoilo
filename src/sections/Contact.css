@@ -30,15 +30,11 @@
 }
 
 .contact-title {
-    font-size: clamp(2rem, 4vw, 3rem);
     margin-bottom: 20px;
     line-height: 1.2;
 }
 
 .contact-description {
-    font-size: 1.1rem;
-    color: var(--text-secondary);
-    line-height: 1.7;
     margin-bottom: 32px;
 }
 

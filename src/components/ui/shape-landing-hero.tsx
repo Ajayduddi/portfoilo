@@ -1,4 +1,5 @@
-import { onMount, type JSX } from 'solid-js';
+import type { JSX } from 'solid-js';
+import { createMotionAnimation } from '../../context/MotionContext';
 import { gsap } from 'gsap';
 import { cn } from '@/lib/utils';
 
@@ -21,18 +22,31 @@ function ElegantShape(props: {
 
     let outerEl!: HTMLDivElement;
     let innerEl!: HTMLDivElement;
+    let entranceShown = false;
 
-    onMount(() => {
-        // Entrance animation (replaces framer-motion initial/animate)
-        gsap.fromTo(
-            outerEl,
-            { opacity: 0, y: -150, rotate: rotate - 15 },
-            {
-                opacity: 1, y: 0, rotate,
-                duration: 2.4, delay,
-                ease: 'power3.out',
-            }
-        );
+    createMotionAnimation(animate => {
+        if (!animate) {
+            entranceShown = true;
+            gsap.set(outerEl, { opacity: 1, y: 0, rotate });
+            gsap.set(innerEl, { y: 0 });
+            return;
+        }
+        const floatDelay = entranceShown ? 0 : delay + 2.4;
+        if (entranceShown) {
+            gsap.set(outerEl, { opacity: 1, y: 0, rotate });
+        } else {
+            // Preserve the initial entrance, without replaying on preference changes.
+            gsap.fromTo(
+                outerEl,
+                { opacity: 0, y: -150, rotate: rotate - 15 },
+                {
+                    opacity: 1, y: 0, rotate,
+                    duration: 2.4, delay,
+                    ease: 'power3.out',
+                }
+            );
+            entranceShown = true;
+        }
 
         // Continuous float loop (replaces framer-motion repeat: Infinity)
         gsap.to(innerEl, {
@@ -41,13 +55,17 @@ function ElegantShape(props: {
             repeat: -1,
             yoyo: true,
             ease: 'sine.inOut',
-            delay: delay + 2.4,
+            delay: floatDelay,
         });
     });
 
     return (
         <div ref={outerEl} class={cn('absolute', props.class)} style={{ opacity: '0' }}>
-            <div ref={innerEl} style={{ width: `${width}px`, height: `${height}px` }} class="relative">
+            <div
+                ref={innerEl}
+                style={{ '--shape-width': `${width}px`, '--shape-height': `${height}px` }}
+                class="relative w-[calc(var(--shape-width)*0.55)] h-[calc(var(--shape-height)*0.55)] sm:w-[calc(var(--shape-width)*0.75)] sm:h-[calc(var(--shape-height)*0.75)] lg:w-[var(--shape-width)] lg:h-[var(--shape-height)]"
+            >
                 <div
                     class={cn(
                         'absolute inset-0 rounded-full',
@@ -78,14 +96,24 @@ function HeroGeometric(props: {
     let titleEl!: HTMLDivElement;
     let descEl!: HTMLDivElement;
     let dotEl!: HTMLDivElement;
+    let entranceShown = false;
 
-    onMount(() => {
-        const tl = gsap.timeline();
-
-        // Fade-up entrance for text blocks (replaces framer-motion fadeUpVariants)
-        tl.fromTo(badgeEl, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1, delay: 0.5, ease: 'power2.out' })
-            .fromTo(titleEl, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1, ease: 'power2.out' }, '-=0.7')
-            .fromTo(descEl, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1, ease: 'power2.out' }, '-=0.7');
+    createMotionAnimation(animate => {
+        if (!animate) {
+            entranceShown = true;
+            gsap.set([badgeEl, titleEl, descEl, dotEl], { opacity: 1, y: 0 });
+            return;
+        }
+        if (entranceShown) {
+            gsap.set([badgeEl, titleEl, descEl], { opacity: 1, y: 0 });
+        } else {
+            const tl = gsap.timeline();
+            // Preserve the initial text entrance timing.
+            tl.fromTo(badgeEl, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1, delay: 0.5, ease: 'power2.out' })
+                .fromTo(titleEl, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1, ease: 'power2.out' }, '-=0.7')
+                .fromTo(descEl, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1, ease: 'power2.out' }, '-=0.7');
+            entranceShown = true;
+        }
 
         // Scroll-dot pulsing loop (replaces framer-motion animate y/opacity)
         gsap.to(dotEl, {
@@ -113,7 +141,7 @@ function HeroGeometric(props: {
                     {/* Badge */}
                     <div
                         ref={badgeEl}
-                        class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] mb-8 md:mb-12"
+                        class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] mb-8 lg:mb-12"
                         style={{ opacity: '0' }}
                     >
                         {/* Inline circle icon (replaces lucide-react Circle) */}
@@ -123,7 +151,7 @@ function HeroGeometric(props: {
 
                     {/* Titles */}
                     <div ref={titleEl} style={{ opacity: '0' }}>
-                        <h1 class="text-4xl sm:text-6xl md:text-8xl font-bold mb-6 md:mb-8 tracking-tight">
+                        <h1 class="text-4xl sm:text-6xl lg:text-8xl font-bold mb-6 lg:mb-8 tracking-tight">
                             <span class="bg-clip-text text-transparent bg-gradient-to-b from-white to-white/80">
                                 {props.title1}
                             </span>
@@ -136,7 +164,7 @@ function HeroGeometric(props: {
 
                     {/* Description + children */}
                     <div ref={descEl} style={{ opacity: '0' }}>
-                        <p class="text-lg sm:text-xl md:text-2xl text-zinc-300 mb-8 leading-relaxed font-light tracking-wide max-w-2xl mx-auto px-4">
+                        <p class="text-lg sm:text-xl lg:text-2xl text-zinc-300 mb-8 leading-relaxed font-light tracking-wide max-w-2xl mx-auto px-4">
                             {props.description}
                         </p>
                         {props.children}

@@ -1,11 +1,15 @@
 import { createSignal, onMount, onCleanup, createMemo, For, Show } from 'solid-js';
 import { gsap } from 'gsap';
+import { createMotionAnimation } from '../context/MotionContext';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DATA } from '../data/portfolio';
 import { usePortfolio } from '../context/PortfolioContext';
+import { safeExternalUrl } from '../lib/urls';
+import { requestJson } from '../lib/request';
+import { parseGitHubActivity, type ContributionDay } from '../services/githubValidation';
 import './CodingProfile.css';
 
-interface ContributionDay { date: string; count: number; level: number; }
-interface GitHubContributions { total: { [year: number]: number }; contributions: ContributionDay[]; }
+gsap.registerPlugin(ScrollTrigger);
 
 export default function CodingProfile() {
     const githubUsername = 'Ajayduddi';
@@ -15,9 +19,34 @@ export default function CodingProfile() {
     const [totalContributions, setTotalContributions] = createSignal(0);
     const [graphPath, setGraphPath] = createSignal('');
     const [points, setPoints] = createSignal<{ x: number; y: number; count: number; date: string }[]>([]);
+    const [graphStatus, setGraphStatus] = createSignal<'loading' | 'ready' | 'empty' | 'error'>('loading');
+    const maxDailyCount = createMemo(() => Math.max(...contributionData().map(day => day.count), 5));
+    const markerPoints = createMemo(() => points().filter((_, index, all) => index % 7 === 0 || index === all.length - 1));
+
+    const dayMs = 24 * 60 * 60 * 1000;
+    const endDate = new Date();
+    endDate.setUTCHours(0, 0, 0, 0);
+    const startDate = new Date(endDate.getTime() - 364 * dayMs);
+    const dateFormatter = new Intl.DateTimeFormat('en-US', { month: 'short', year: '2-digit', timeZone: 'UTC' });
+    const dateTicks = Array.from({ length: 5 }, (_, index) => ({
+        x: 20 + (index / 4) * 560,
+        label: dateFormatter.format(new Date(startDate.getTime() + Math.round((index / 4) * 364) * dayMs)),
+    }));
 
     let pathEl!: SVGPathElement;
     let circlesContainer!: SVGGElement;
+    let graphEl!: HTMLDivElement;
+    let graphStarted = false;
+    let reducedSeen = false;
+    let reducedObserver: IntersectionObserver | undefined;
+    let disposed = false;
+    const controller = new AbortController();
+
+    onCleanup(() => {
+        disposed = true;
+        controller.abort();
+        reducedObserver?.disconnect();
+    });
 
     const hackerrankBadges = createMemo(() =>
         portfolioData()?.stats?.find(s =>
@@ -27,7 +56,7 @@ export default function CodingProfile() {
     );
 
     const getSocial = (name: string, fallback: string) =>
-        portfolioData()?.socials?.find(s => s.Name.toLowerCase() === name)?.link ?? fallback;
+        safeExternalUrl(portfolioData()?.socials?.find(s => s.Name.trim().toLowerCase() === name)?.link) || safeExternalUrl(fallback);
 
     const githubLink = createMemo(() => getSocial('github', DATA.profile.socials.github));
     const leetcodeLink = createMemo(() => getSocial('leetcode', DATA.profile.socials.leetcode));
@@ -36,66 +65,84 @@ export default function CodingProfile() {
     const code360Link = createMemo(() => getSocial('code360', DATA.profile.socials.code360));
     const gfgLink = createMemo(() => getSocial('geeksforgeeks', DATA.profile.socials['geeksforgeeks'] ?? ''));
 
+    const solvedPercentage = (count: number) => {
+        const total = leetcodeStats()?.total ?? 0;
+        return total > 0 ? Math.min(100, Math.max(0, (count / total) * 100)) : 0;
+    };
+
+    createMotionAnimation(animate => {
+        reducedObserver?.disconnect();
+        if (!animate) {
+            reducedSeen = true;
+            reducedObserver = new IntersectionObserver(entries => {
+                if (entries.some(entry => entry.isIntersecting)) {
+                    graphStarted = true;
+                    reducedObserver?.disconnect();
+                }
+            });
+            reducedObserver.observe(graphEl);
+            return () => reducedObserver?.disconnect();
+        }
+        const rect = graphEl.getBoundingClientRect();
+        if (graphStarted || (reducedSeen && rect.top < innerHeight && rect.bottom > 0)) {
+            graphStarted = true;
+            return;
+        }
+        const timeline = gsap.timeline({
+            onStart: () => { graphStarted = true; },
+            scrollTrigger: { trigger: graphEl, start: 'top 90%', once: true },
+        });
+        if (pathEl) {
+            const length = pathEl.getTotalLength();
+            if (length > 0) timeline.fromTo(pathEl,
+                { strokeDasharray: length, strokeDashoffset: length, opacity: 0 },
+                { strokeDashoffset: 0, opacity: 1, duration: 2, ease: 'power2.inOut' }, 0
+            );
+        }
+        if (circlesContainer) timeline.fromTo(circlesContainer.querySelectorAll('circle'),
+            { scale: 0, opacity: 0, transformOrigin: 'center' },
+            { scale: 1, opacity: 1, duration: 0.3, stagger: { amount: 0.8 }, ease: 'back.out(1.7)' }, 0.8
+        );
+    }, () => graphStatus() === 'ready');
+
     onMount(async () => {
         try {
-            const res = await fetch(`https://github-contributions-api.jogruber.de/v4/${githubUsername}`);
-            const data: GitHubContributions = await res.json();
+            const raw = await requestJson(`https://github-contributions-api.jogruber.de/v4/${githubUsername}`, { signal: controller.signal });
+            if (disposed) return;
+            const today = endDate.toISOString().split('T')[0];
+            const firstDay = startDate.toISOString().split('T')[0];
+            const data = parseGitHubActivity(raw, firstDay, today);
+            setTotalContributions(data.total);
+            const lastYear = data.contributions;
+            setContributionData(lastYear);
 
-            if (data?.total) {
-                const total = Object.values(data.total).reduce((a, c) => a + c, 0);
-                setTotalContributions(total);
+            if (!lastYear.length) {
+                setGraphStatus('empty');
+                return;
             }
 
-            if (data?.contributions) {
-                const today = new Date().toISOString().split('T')[0];
-                const sorted = [...data.contributions].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-                const last30 = sorted.filter(d => d.date <= today).slice(-30);
-                setContributionData(last30);
+            const W = 600, H = 200, P = 20;
+            const maxCount = maxDailyCount();
+            const pts = lastYear.map(day => ({
+                x: ((Date.parse(day.date) - startDate.getTime()) / (364 * dayMs)) * (W - 2 * P) + P,
+                y: H - ((day.count / maxCount) * (H - 2 * P) + P),
+                count: day.count,
+                date: day.date,
+            }));
+            setPoints(pts);
 
-                if (last30.length > 0) {
-                    const W = 600, H = 200, P = 20;
-                    const maxCount = Math.max(...last30.map(d => d.count), 5);
-                    const pts = last30.map((day, i) => ({
-                        x: (i / (last30.length - 1)) * (W - 2 * P) + P,
-                        y: H - ((day.count / maxCount) * (H - 2 * P) + P),
-                        count: day.count,
-                        date: day.date,
-                    }));
-                    setPoints(pts);
-
-                    if (pts.length > 1) {
-                        let d = `M ${pts[0].x} ${pts[0].y}`;
-                        for (let i = 0; i < pts.length - 1; i++) {
-                            const p0 = pts[i], p1 = pts[i + 1];
-                            d += ` C ${p0.x + (p1.x - p0.x) / 3} ${p0.y}, ${p1.x - (p1.x - p0.x) / 3} ${p1.y}, ${p1.x} ${p1.y}`;
-                        }
-                        setGraphPath(d);
-
-                        // Animate the SVG path with GSAP (replaces framer-motion motion.path)
-                        requestAnimationFrame(() => {
-                            if (pathEl) {
-                                const length = pathEl.getTotalLength();
-                                gsap.fromTo(pathEl,
-                                    { strokeDasharray: length, strokeDashoffset: length, opacity: 0 },
-                                    { strokeDashoffset: 0, opacity: 1, duration: 2, ease: 'power2.inOut' }
-                                );
-                            }
-                            // Animate circles with GSAP (replaces framer-motion motion.circle)
-                            if (circlesContainer) {
-                                const circles = circlesContainer.querySelectorAll('circle');
-                                circles.forEach((c, i) => {
-                                    gsap.fromTo(c,
-                                        { scale: 0, opacity: 0, transformOrigin: 'center' },
-                                        { scale: 1, opacity: 1, duration: 0.3, delay: 1 + i * 0.03, ease: 'back.out(1.7)' }
-                                    );
-                                });
-                            }
-                        });
-                    }
-                }
+            let d = `M ${pts[0].x} ${pts[0].y}`;
+            for (let i = 0; i < pts.length - 1; i++) {
+                const p0 = pts[i], p1 = pts[i + 1];
+                d += ` C ${p0.x + (p1.x - p0.x) / 3} ${p0.y}, ${p1.x - (p1.x - p0.x) / 3} ${p1.y}, ${p1.x} ${p1.y}`;
             }
-        } catch (err) {
-            console.error('[CodingProfile] GitHub fetch failed:', err);
+            setGraphPath(d);
+            setGraphStatus('ready');
+
+        } catch {
+            if (disposed) return;
+            setGraphStatus('error');
+            console.warn('[CodingProfile] GitHub activity is unavailable');
         }
     });
 
@@ -114,15 +161,19 @@ export default function CodingProfile() {
                     <div class="bento-card github-main-stats fade-in stagger-1">
                         <div class="card-header">
                             <i class="fab fa-github card-icon"></i>
-                            <h3 class="card-title">GitHub Activity (Last 30 Days)</h3>
-                            <a href={githubLink()} target="_blank" rel="noreferrer" class="card-link-icon">
+                            <h3 class="card-title">GitHub Activity (Last Year)</h3>
+                            <a href={githubLink()} target="_blank" rel="noreferrer" class="card-link-icon" aria-label="View GitHub profile">
                                 <i class="fas fa-external-link-alt"></i>
                             </a>
                         </div>
                         <div class="stats-content graph-container">
-                            <Show when={graphPath()} fallback={<div class="loading-graph">Loading activity data...</div>}>
-                                <div class="github-graph-wrapper">
-                                    <svg viewBox="0 0 600 200" class="github-graph-svg">
+                            <Show when={graphStatus() === 'ready'} fallback={
+                                <div class="loading-graph" role="status">
+                                    {graphStatus() === 'loading' ? 'Loading activity data...' : graphStatus() === 'empty' ? 'No activity data available for the past year.' : 'GitHub activity is temporarily unavailable.'}
+                                </div>
+                            }>
+                                <div ref={graphEl} class="github-graph-wrapper">
+                                    <svg viewBox="0 0 600 200" class="github-graph-svg" role="img" aria-label="Daily GitHub contributions over the past 365 days">
                                         <defs>
                                             <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                                                 <stop offset="0%" stop-color="#2563eb" />
@@ -137,23 +188,17 @@ export default function CodingProfile() {
 
                                         <text x="10" y="185" fill="#94a3b8" font-size="10" text-anchor="middle">0</text>
                                         <text x="10" y="105" fill="#94a3b8" font-size="10" text-anchor="middle">
-                                            {Math.round(Math.max(...contributionData().map(d => d.count), 5) / 2)}
+                                            {Math.round(maxDailyCount() / 2)}
                                         </text>
                                         <text x="10" y="25" fill="#94a3b8" font-size="10" text-anchor="middle">
-                                            {Math.max(...contributionData().map(d => d.count), 5)}
+                                            {maxDailyCount()}
                                         </text>
 
-                                        <For each={contributionData()}>{(d, i) => {
-                                            const show = i() % 7 === 0 || i() === contributionData().length - 1;
-                                            if (!show) return null;
-                                            const x = (i() / (contributionData().length - 1)) * (600 - 40) + 20;
-                                            const date = new Date(d.date);
-                                            return (
-                                                <text x={x} y="198" fill="#94a3b8" font-size="10" text-anchor="middle">
-                                                    {`${date.getMonth() + 1}/${date.getDate()}`}
-                                                </text>
-                                            );
-                                        }}</For>
+                                        <For each={dateTicks}>{tick => (
+                                            <text x={tick.x} y="198" fill="#94a3b8" font-size="10" text-anchor="middle">
+                                                {tick.label}
+                                            </text>
+                                        )}</For>
 
                                         {/* GSAP-animated path (replaces framer-motion motion.path) */}
                                         <path
@@ -163,16 +208,16 @@ export default function CodingProfile() {
                                             stroke="url(#lineGradient)"
                                             stroke-width="3"
                                             stroke-linecap="round"
-                                            opacity="0"
+                                            opacity="1"
                                         />
 
                                         {/* GSAP-animated circles (replaces framer-motion motion.circle) */}
                                         <g ref={circlesContainer}>
-                                            <For each={points()}>{(p) => (
+                                            <For each={markerPoints()}>{(p) => (
                                                 <circle
-                                                    cx={p.x} cy={p.y} r="4"
+                                                    cx={p.x} cy={p.y} r="3"
                                                     fill="#1e293b" stroke="#60a5fa" stroke-width="2"
-                                                    style={{ opacity: '0' }}
+                                                    style={{ opacity: '1' }}
                                                     class="graph-point"
                                                 >
                                                     <title>{`${p.date}: ${p.count} contributions`}</title>
@@ -190,7 +235,7 @@ export default function CodingProfile() {
                         <div class="card-header">
                             <i class="fas fa-code card-icon"></i>
                             <h3 class="card-title">LeetCode</h3>
-                            <a href={leetcodeLink()} target="_blank" rel="noreferrer" class="card-link-icon">
+                            <a href={leetcodeLink()} target="_blank" rel="noreferrer" class="card-link-icon" aria-label="View LeetCode profile">
                                 <i class="fas fa-external-link-alt"></i>
                             </a>
                         </div>
@@ -213,7 +258,7 @@ export default function CodingProfile() {
                                         </div>
                                         <div class="progress-track">
                                             <div class={`progress-fill ${row.cls}-bg`} style={{
-                                                width: `${leetcodeStats()?.total ? (row.val() / leetcodeStats()!.total) * 100 : 0}%`
+                                                width: `${solvedPercentage(row.val())}%`
                                             }}></div>
                                         </div>
                                     </div>
@@ -230,11 +275,11 @@ export default function CodingProfile() {
                         </div>
                         <div class="stat-grid">
                             <For each={[
-                                { icon: 'fab fa-github', value: () => totalContributions() > 0 ? totalContributions().toLocaleString() : '-', label: 'Contributions' },
-                                { icon: 'fab fa-hackerrank', value: () => hackerrankBadges(), label: 'HackerRank Badges' },
-                                { icon: 'fas fa-utensils', value: () => String(codechefData()?.data?.totalProblemsSolved ?? '-'), label: 'CodeChef Solved' },
+                                { platform: 'github', icon: 'fab fa-github', value: () => graphStatus() === 'loading' || graphStatus() === 'error' ? '-' : totalContributions().toLocaleString(), label: 'Contributions' },
+                                { platform: 'hackerrank', icon: 'fab fa-hackerrank', value: () => hackerrankBadges(), label: 'HackerRank Badges' },
+                                { platform: 'codechef', icon: 'fas fa-utensils', value: () => String(codechefData()?.data?.totalProblemsSolved ?? '-'), label: 'CodeChef Solved' },
                             ]}>{(stat) => (
-                                <div class="stat-card github">
+                                <div class={`stat-card ${stat.platform}`}>
                                     <div class="stat-icon-wrapper"><i class={stat.icon}></i></div>
                                     <div class="stat-info">
                                         <span class="stat-value">{stat.value()}</span>

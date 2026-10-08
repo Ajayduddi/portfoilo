@@ -1,6 +1,16 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* Preserve the portfolio's v3 palette during the Tailwind v4 migration. */
+@theme {
+    --color-indigo-300: #a5b4fc;
+    --color-indigo-500: #6366f1;
+    --color-rose-300: #fda4af;
+    --color-rose-500: #f43f5e;
+    --color-violet-500: #8b5cf6;
+    --color-amber-500: #f59e0b;
+    --color-cyan-500: #06b6d4;
+    --color-zinc-300: #d4d4d8;
+}
 
 /* ============================================
    SPOTLIGHT PREMIUM - Global Styles
@@ -8,12 +18,14 @@
    ============================================ */
 
 /* Reset & Base */
-*,
-*::before,
-*::after {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+@layer base {
+    *,
+    *::before,
+    *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 }
 
 :root {
@@ -100,14 +112,16 @@ section {
 }
 
 /* Typography */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-    font-weight: 600;
-    line-height: 1.2;
+@layer base {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-weight: 600;
+        line-height: 1.2;
+    }
 }
 
 .font-display {
@@ -115,14 +129,27 @@ h6 {
 }
 
 /* Links */
-a {
-    color: inherit;
-    text-decoration: none;
-    transition: color var(--transition-normal);
+@layer base {
+    a {
+        color: inherit;
+        text-decoration: none;
+        transition: color var(--transition-normal);
+    }
+
+    a:hover {
+        color: var(--accent);
+    }
 }
 
-a:hover {
-    color: var(--accent);
+/* Keep the original hero padding while utilities live in Tailwind's layers. */
+#hero .container {
+    padding-inline: 20px;
+}
+
+@media (min-width: 768px) {
+    #hero .container {
+        padding-inline: 24px;
+    }
 }
 
 /* Buttons */
@@ -245,11 +272,18 @@ a:hover {
     color: var(--text-primary);
 }
 
+.section-description {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    line-height: 1.7;
+}
+
 /* Fade In Animation — driven by IntersectionObserver toggling .visible */
 .fade-in {
     opacity: 0;
     transform: translateY(40px);
-    transition: opacity 0.7s ease, transform 0.7s ease;
+    transition: opacity 0.7s ease var(--reveal-delay, 0s), transform 0.7s ease var(--reveal-delay, 0s),
+        border-color var(--transition-normal), box-shadow var(--transition-normal), background-color var(--transition-normal);
 }
 
 .fade-in.visible {
@@ -280,19 +314,19 @@ a:hover {
 
 /* Stagger animation delay for children */
 .stagger-1 {
-    transition-delay: 0.1s;
+    --reveal-delay: 0.1s;
 }
 
 .stagger-2 {
-    transition-delay: 0.2s;
+    --reveal-delay: 0.2s;
 }
 
 .stagger-3 {
-    transition-delay: 0.3s;
+    --reveal-delay: 0.3s;
 }
 
 .stagger-4 {
-    transition-delay: 0.4s;
+    --reveal-delay: 0.4s;
 }
 
 /* Smooth image loading - images are visible by default; GSAP handles reveal animation */
@@ -301,11 +335,39 @@ img {
     transition: opacity 0.5s ease;
 }
 
+.image-placeholder {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.image-reveal {
+    width: 100%;
+    height: 100%;
+}
+
+.image-placeholder i {
+    color: var(--accent);
+    font-size: 2rem;
+}
+
 /* Focus styles for accessibility */
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
 textarea:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+}
+
+select:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 3px;
 }
@@ -330,11 +392,25 @@ textarea:focus-visible {
     }
 }
 
-/* Smooth page transitions */
-@media (prefers-reduced-motion: no-preference) {
-    html {
-        scroll-behavior: smooth;
-    }
+/* MotionProvider enables motion for the portfolio. */
+html[data-motion="off"] {
+    scroll-behavior: auto;
+}
+
+html[data-motion="off"] *,
+html[data-motion="off"] *::before,
+html[data-motion="off"] *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+}
+
+html[data-motion="off"] .fade-in {
+    opacity: 1;
+    transform: none;
 }
 
 /* Print styles */

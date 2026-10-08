@@ -74,10 +74,13 @@
 }
 
 .main-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
     margin-bottom: 20px;
 }
 
-.stat-value {
+.coding-profile .stat-value {
     display: block;
     font-size: 2.5rem;
     font-weight: 700;
@@ -87,15 +90,10 @@
     font-family: var(--font-display);
 }
 
-.stat-label {
+.coding-profile .stat-label {
     font-size: 0.85rem;
     color: var(--text-secondary);
     display: block;
-}
-
-.stat-row {
-    display: flex;
-    gap: 24px;
 }
 
 /* Progress Bars */
@@ -125,6 +123,10 @@
     height: 100%;
     border-radius: 3px;
     transition: width 1s ease-out;
+}
+
+html[data-motion="on"] .leetcode-main-stats:not(.visible) .progress-fill {
+    width: 0 !important;
 }
 
 .difficulty {
@@ -214,10 +216,6 @@
 
 .leetcode-main-stats {
     grid-column: span 4;
-    grid-row: span 2;
-    /* Make it tall to match old layout height if desired, or span 1 mixed */
-    /* Old layout: LeetCode was span 4 row 1. Streak was span 6 row 2. */
-    /* Let's try to match the rows better. */
     grid-row: span 1;
     background: linear-gradient(135deg, rgba(40, 40, 40, 0.5), rgba(40, 40, 40, 0.8));
 }
@@ -231,7 +229,7 @@
     grid-column: span 6;
     grid-row: span 1;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 24px;
 }
 
@@ -239,6 +237,7 @@
 @media (max-width: 1024px) {
     .bento-grid {
         grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: auto;
     }
 
     .github-main-stats,
@@ -251,6 +250,7 @@
 
 /* Profile Mini Cards */
 .profile-card {
+    min-width: 0;
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     border-radius: 20px;
@@ -293,48 +293,20 @@
 }
 
 .profile-info h4 {
+    overflow-wrap: anywhere;
     font-size: 1rem;
     margin-bottom: 4px;
     color: var(--text-primary);
 }
 
 .profile-info span {
+    overflow-wrap: anywhere;
     font-size: 0.85rem;
     color: var(--text-secondary);
 }
 
 .profile-card:hover .profile-info span {
     color: var(--accent);
-}
-
-/* Stat Images */
-.stat-image {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    border-radius: 12px;
-}
-
-.leetcode-stat-image {
-    width: 100%;
-    /* height: 100%; */
-    /* object-fit: contain; */
-    border-radius: 12px;
-}
-
-/* Responsive */
-@media (max-width: 1024px) {
-    .bento-grid {
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: auto;
-    }
-
-    .github-stats,
-    .leetcode-stats,
-    .github-activity,
-    .profiles-grid {
-        grid-column: span 2;
-    }
 }
 
 @media (max-width: 768px) {
@@ -344,7 +316,7 @@
     }
 
     .profiles-grid {
-        grid-template-columns: 1fr;
+        gap: 16px;
     }
 }
 
@@ -445,5 +417,18 @@
 @media (max-width: 480px) {
     .stat-grid {
         grid-template-columns: 1fr;
+    }
+
+    .profile-card {
+        padding: 14px;
+    }
+
+    .profile-info h4 {
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+
+    .profile-info span {
+        font-size: 0.8rem;
     }
 }

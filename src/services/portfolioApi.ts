@@ -1,6 +1,16 @@
 // ─── API Endpoint Interfaces ──────────────────────────────────────────────────
 
-const BASE = 'https://n8n.ajayduddi.site/webhook';
+import { normalizeApiBase } from '../lib/apiConfig';
+import { requestJson, requestOk } from '../lib/request';
+import { validateContactMessage, type ContactMessage } from '../lib/contactValidation';
+import { parsePortfolio, parseLeetcode, parseCodechef } from './portfolioValidation';
+
+const BASE = normalizeApiBase(import.meta.env.VITE_PORTFOLIO_API_BASE_URL, import.meta.env.DEV);
+type PortfolioEndpoint = 'portfolio' | 'leetcode-profile' | 'codechef-profile' | 'portfolioEmail';
+
+export function portfolioEndpoint(endpoint: PortfolioEndpoint): string {
+    return `${BASE}/${endpoint}`;
+}
 
 // /webhook/portfolio
 export interface ApiProfileData {
@@ -38,6 +48,7 @@ export interface ApiExperience {
     description: string;   // "-," separated string
     type: 'work' | 'education';
     sort: number;
+    'Company Logo'?: string;
 }
 
 export interface ApiStat {
@@ -88,51 +99,33 @@ export interface CodechefApiResponse {
 // ─── Fetch Functions ───────────────────────────────────────────────────────────
 
 /** Fetch full portfolio data (profile, projects, experience, stats, socials) */
-export async function fetchPortfolioData(): Promise<PortfolioApiResponse | null> {
-    try {
-        const res = await fetch(`${BASE}/portfolio`, { referrer: 'no-referrer', referrerPolicy: 'no-referrer' });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        // Response is an array wrapping one object: [{ data: {...} }]
-        const json: [{ data: PortfolioApiResponse }] = await res.json();
-        return json[0]?.data ?? null;
-    } catch (err) {
-        console.error('[portfolioApi] fetchPortfolioData failed:', err);
-        return null;
-    }
+export function fetchPortfolioData(signal?: AbortSignal): Promise<PortfolioApiResponse | null> {
+    return fetchParsed('portfolio', parsePortfolio, signal);
 }
 
 /** Fetch LeetCode problem-solving statistics */
-export async function fetchLeetcodeStats(): Promise<LeetcodeStats | null> {
+export function fetchLeetcodeStats(signal?: AbortSignal): Promise<LeetcodeStats | null> {
+    return fetchParsed('leetcode-profile', parseLeetcode, signal);
+}
+
+/** Fetch CodeChef profile statistics */
+export function fetchCodechefStats(signal?: AbortSignal): Promise<CodechefApiResponse | null> {
+    return fetchParsed('codechef-profile', parseCodechef, signal);
+}
+
+async function fetchParsed<T>(endpoint: PortfolioEndpoint, parse: (value: unknown) => T, signal?: AbortSignal): Promise<T | null> {
     try {
-        const res = await fetch(`${BASE}/leetcode-profile`, { referrer: 'no-referrer', referrerPolicy: 'no-referrer' });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json: LeetcodeApiResponse = await res.json();
-        const entries = json.data ?? [];
-
-        const get = (diff: LeetcodeEntry['difficulty']) =>
-            entries.find(e => e.difficulty === diff)?.count ?? 0;
-
-        return {
-            total: get('All'),
-            easy: get('Easy'),
-            medium: get('Medium'),
-            hard: get('Hard'),
-        };
-    } catch (err) {
-        console.error('[portfolioApi] fetchLeetcodeStats failed:', err);
+        return parse(await requestJson(portfolioEndpoint(endpoint), { signal, referrerPolicy: 'no-referrer' }));
+    } catch {
+        if (!signal?.aborted) console.warn(`[portfolioApi] ${endpoint} is unavailable`);
         return null;
     }
 }
 
-/** Fetch CodeChef profile statistics */
-export async function fetchCodechefStats(): Promise<CodechefApiResponse | null> {
-    try {
-        const res = await fetch(`${BASE}/codechef-profile`, { referrer: 'no-referrer', referrerPolicy: 'no-referrer' });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json: CodechefApiResponse = await res.json();
-        return json;
-    } catch (err) {
-        console.error('[portfolioApi] fetchCodechefStats failed:', err);
-        return null;
-    }
+export async function sendContactMessage(message: ContactMessage, signal?: AbortSignal): Promise<void> {
+    const body = validateContactMessage(message);
+    await requestOk(portfolioEndpoint('portfolioEmail'), {
+        method: 'POST', signal, headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body), referrerPolicy: 'no-referrer',
+    });
 }
